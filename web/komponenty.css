@@ -1,0 +1,250 @@
+
+.nk-upozorneni{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;
+  border-radius:12px;background:var(--karta);border-left:4px solid var(--cyan)}
+.nk-upozorneni-uspech{border-left-color:var(--zelena)}
+.nk-upozorneni-varovani{border-left-color:var(--zluta)}
+.nk-upozorneni-znak{flex:0 0 auto;font-weight:700;color:var(--cyan)}
+.nk-upozorneni-uspech .nk-upozorneni-znak{color:var(--zelena)}
+.nk-upozorneni-varovani .nk-upozorneni-znak{color:var(--zluta)}
+/* Osm druhů jako jejich alert-*. Barvy jen z tokenů, ať se s motivem nerozejdou. */
+.nk-upozorneni-nebezpeci{border-left-color:var(--live)}
+.nk-upozorneni-nebezpeci .nk-upozorneni-znak{color:var(--live)}
+.nk-upozorneni-hlavni{border-left-color:var(--zluta)}
+.nk-upozorneni-hlavni .nk-upozorneni-znak{color:var(--zluta)}
+.nk-upozorneni-sekundarni{border-left-color:var(--seda)}
+.nk-upozorneni-sekundarni .nk-upozorneni-znak{color:var(--seda)}
+.nk-upozorneni-svetle{background:var(--vrstva);border-left-color:var(--bila)}
+.nk-upozorneni-svetle .nk-upozorneni-znak{color:var(--bila)}
+.nk-upozorneni-tmave{background:var(--nejtmavsi);border-left-color:var(--bila)}
+.nk-upozorneni-tmave .nk-upozorneni-znak{color:var(--bila)}
+.nk-upozorneni-text{flex:1 1 auto}
+.nk-upozorneni-zavri{flex:0 0 auto;margin:-2px -6px 0 0;padding:0 4px;border:0;
+  background:none;color:inherit;font-size:15px;line-height:1.4;cursor:pointer;opacity:.65}
+.nk-upozorneni-zavri:hover{opacity:1}
+/* Natočení má v jejich knihovně jediná komponenta – upozornění. */
+.nk-rotace{transform:rotate(var(--rotace,0deg))}
+.nk-video{width:var(--video-sirka,100%);margin-inline:auto}
+.nk-video-ramec{position:relative;width:100%;padding-bottom:var(--video-pomer,56.25%);
+  height:0;overflow:hidden;border-radius:12px;background:var(--karta)}
+.nk-video-ramec>iframe,.nk-video-ramec>video{position:absolute;top:0;left:0;
+  width:100%;height:100%;border:0}
+.nk-faq{display:block}
+.nk-faq-polozka{border:1px solid var(--linka);border-radius:12px;
+  overflow:hidden;margin:0 0 10px}
+.nk-faq-polozka>summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;
+  background:var(--faq-zahlavi-pozadi,var(--karta));color:var(--faq-zahlavi-barva,var(--bila))}
+.nk-faq-polozka>summary::-webkit-details-marker{display:none}
+.nk-faq-polozka>summary::after{content:"+";float:right;color:var(--cyan)}
+.nk-faq-polozka[open]>summary::after{content:"–"}
+.nk-faq-obsah{padding:14px 18px 16px;background:var(--faq-obsah-pozadi,var(--karta));
+  color:var(--faq-obsah-barva,var(--seda))}
+
+/* Reference. Mřížka drží počet sloupců z panelu, karusel je scroll-snap pás –
+   posun tak nepotřebuje ani řádek skriptu. */
+.nk-testimonialy-mrizka{display:grid;gap:16px;
+  grid-template-columns:repeat(var(--tst-sloupce,3),minmax(0,1fr))}
+.nk-testimonialy-karusel{display:flex;gap:16px;overflow-x:auto;
+  scroll-snap-type:x mandatory;scroll-behavior:smooth;padding-bottom:6px}
+.nk-testimonialy-karusel .nk-testimonial{flex:0 0 min(360px,86%);scroll-snap-align:center}
+.nk-testimonial{margin:0;padding:18px;border:1px solid var(--linka);
+  border-radius:14px;background:var(--karta)}
+.nk-testimonial-hvezdy{display:flex;gap:2px;margin:0 0 10px;line-height:0;color:var(--zluta)}
+.nk-hvezda-prazdna{display:inline-flex;gap:2px;opacity:.25}
+.nk-testimonial-text{margin:0 0 12px;quotes:none}
+.nk-testimonial-noha{display:flex;align-items:center;gap:12px}
+.nk-testimonial-avatar{flex:0 0 auto;width:44px;height:44px;border-radius:50%;
+  object-fit:cover}
+.nk-testimonial-kdo{display:flex;flex-direction:column}
+.nk-testimonial-autor{font-weight:600}
+.nk-testimonial-role{color:var(--seda);font-size:14px}
+.nk-testimonial-datum{color:var(--seda);font-size:13px}
+@media(max-width:620px){.nk-testimonialy-mrizka{grid-template-columns:1fr}}
+.nk-odpocet{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.nk-odpocet-blok{min-width:78px;padding:12px 10px;text-align:center;border-radius:12px;
+  background:var(--odpocet-pozadi,var(--karta));
+  border:1px solid var(--odpocet-linka,var(--linka))}
+.nk-odpocet-blok b{display:block;font-size:30px;line-height:1.1;
+  color:var(--odpocet-barva,var(--cyan));font-variant-numeric:tabular-nums}
+.nk-odpocet-blok span{font-size:13px;color:var(--odpocet-tlumena,var(--seda))}
+.nk-odpocet-popis{flex:1 1 180px;margin:0;color:var(--odpocet-tlumena,var(--seda))}
+.nk-ukazatel-drah{position:relative;height:14px;border-radius:999px;
+  background:var(--ukazatel-draha,var(--karta));border:1px solid var(--linka);overflow:hidden}
+.nk-ukazatel-s-cislem{height:22px}
+.nk-ukazatel-vypln{height:100%;background:var(--ukazatel-vypln,var(--cyan));
+  transition:width .4s ease}
+/* Pruhy kreslí gradient, animace jen posouvá jeho pozici – žádný obrázek. */
+.nk-ukazatel-pruhy{background-image:repeating-linear-gradient(45deg,
+  rgba(0,0,0,.18) 0 8px,rgba(0,0,0,0) 8px 16px);background-size:22px 22px}
+@keyframes nk-pruhy{from{background-position:0 0}to{background-position:22px 0}}
+.nk-ukazatel-animace{animation:nk-pruhy .8s linear infinite}
+.nk-ukazatel-cislo{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:600;color:var(--bila)}
+.nk-ukazatel-popis{margin:8px 0 0;font-size:14px;color:var(--seda)}
+.nk-ikony-socialni{display:flex;flex-wrap:wrap;gap:var(--ikony-mezera,14px);align-items:center}
+.nk-sit{display:inline-flex;line-height:0;color:var(--ikony-barva,var(--cyan))}
+.nk-sit svg{width:var(--ikony-velikost,24px);height:var(--ikony-velikost,24px)}
+.nk-sit:hover{color:var(--zluta)}
+.nk-nabidka{padding:24px;border:2px dashed var(--cyan);border-radius:16px;
+  background:var(--karta);text-align:center}
+.nk-nabidka-nadpis{margin:0 0 10px}
+.nk-nabidka-ceny{margin:0}
+.nk-nabidka-cena{font-size:34px;font-weight:700;color:var(--zluta)}
+.nk-nabidka-puvodni{margin-left:10px;color:var(--seda);font-size:18px}
+.nk-nabidka-body{list-style:none;display:inline-block;margin:16px 0;padding:0;text-align:left}
+.nk-nabidka-body li{position:relative;margin:6px 0;padding-left:24px}
+.nk-nabidka-body li::before{content:"✓";position:absolute;left:0;color:var(--zelena)}
+
+/* Tlačítka. Základ je gradientní CTA z brandbooku, šablony jen přebarvují
+   a mění tvar – rozměry a písmo zůstávají stejné, ať stránka drží rytmus. */
+.nk-cta-obal{display:block}
+.nk-cta-obal-vlevo{text-align:left}
+.nk-cta-obal-stred{text-align:center}
+.nk-cta-obal-vpravo{text-align:right}
+.nk-cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:17px 34px;border:0;border-radius:100px;
+  background:linear-gradient(var(--cta-top) 0%,var(--cta-bot) 100%);
+  box-shadow:var(--cta-glow) 0 18px 48px 0;color:var(--nejtmavsi);
+  font-family:"Instrument Sans",system-ui,sans-serif;font-weight:600;font-size:15px;
+  letter-spacing:.04em;text-transform:uppercase;text-decoration:none;
+  white-space:nowrap;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.nk-cta:hover,.nk-cta:focus-visible{transform:translateY(-1px);
+  box-shadow:var(--cta-glow) 0 22px 56px 0}
+
+.nk-cta-hranate{border-radius:8px}
+.nk-cta-cyan{background:var(--cyan);color:var(--nejtmavsi);box-shadow:none}
+.nk-cta-bile{background:var(--bila);color:var(--nejtmavsi);box-shadow:none}
+.nk-cta-tmave{background:var(--nejtmavsi);color:var(--bila);box-shadow:none}
+.nk-cta-zelene{background:var(--zelena);color:var(--bila);box-shadow:none}
+.nk-cta-obrys{background:none;box-shadow:none;color:var(--zluta);
+  border:2px solid var(--zluta);padding:15px 32px}
+.nk-cta-obrys-cyan{background:none;box-shadow:none;color:var(--cyan);
+  border:2px solid var(--cyan);padding:15px 32px}
+.nk-cta-obrys-bily{background:none;box-shadow:none;color:var(--bila);
+  border:2px solid var(--bila);padding:15px 32px}
+.nk-cta-duch{background:none;box-shadow:none;color:var(--bila);
+  border:1px solid var(--linka);padding:16px 32px}
+.nk-cta-odkaz{background:none;box-shadow:none;color:var(--zluta);padding:6px 0;
+  border-radius:0;border-bottom:2px solid var(--zluta);text-transform:none;
+  letter-spacing:0}
+.nk-cta-velke{padding:22px 46px;font-size:17px}
+.nk-cta-male{padding:12px 24px;font-size:13px}
+.nk-cta-siroke{display:flex;width:100%}
+.nk-cta-plne{display:flex;width:100%}
+.nk-cta-ikona{flex:0 0 auto;display:inline-flex;line-height:0}
+.nk-cta-popis{display:flex;flex-direction:column;align-items:center;line-height:1.2}
+/* Podtext je jejich 65 % velikosti hlavního textu a nekřičí verzálkami. */
+.nk-cta-podtext{margin-top:3px;font-size:.65em;font-weight:400;opacity:.85;
+  text-transform:none;letter-spacing:.02em}
+
+/* Efekty tlačítka. Kdo si vypnul animace v systému, dostane klid. */
+@keyframes nk-cta-tanec{0%,100%{transform:none}
+  25%{transform:rotate(-2deg) scale(1.03)}75%{transform:rotate(2deg) scale(1.03)}}
+.nk-cta-efekt-tanec{animation:nk-cta-tanec 1.6s ease-in-out infinite}
+@keyframes nk-cta-pulz{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.nk-cta-efekt-pulz{animation:nk-cta-pulz 1.4s ease-in-out infinite}
+@keyframes nk-cta-stin{0%,100%{box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  50%{box-shadow:0 16px 44px rgba(0,0,0,.5)}}
+.nk-cta-efekt-ze-stinu{animation:nk-cta-stin 2s ease-in-out infinite}
+@keyframes nk-cta-ram{0%{box-shadow:0 0 0 0 var(--cta-glow)}
+  70%{box-shadow:0 0 0 14px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+.nk-cta-efekt-pulzujici-ram{animation:nk-cta-ram 1.8s ease-out infinite}
+@media(prefers-reduced-motion:reduce){
+  .nk-cta-efekt-tanec,.nk-cta-efekt-pulz,.nk-cta-efekt-ze-stinu,
+  .nk-cta-efekt-pulzujici-ram{animation:none}}
+@media(max-width:620px){
+  .nk-cta-obal-m-vlevo{text-align:left}
+  .nk-cta-obal-m-stred{text-align:center}
+  .nk-cta-obal-m-vpravo{text-align:right}
+  .nk-cta-plne-m{display:flex;width:100%}}
+.nk-cta-zar{box-shadow:var(--cta-glow) 0 0 0 6px,var(--cta-glow) 0 24px 60px 0}
+.nk-cta-prechod{background:linear-gradient(100deg,var(--cyan) 0%,var(--cta-bot) 100%)}
+.nk-cta-prechod-tmavy{background:linear-gradient(100deg,var(--vrstva) 0%,var(--nejtmavsi) 100%);
+  color:var(--bila);box-shadow:none}
+.nk-cta-cervene{background:var(--live);color:var(--bila);box-shadow:none}
+.nk-cta-oranzove{background:var(--zluta);color:var(--nejtmavsi);box-shadow:none}
+.nk-cta-kulate{border-radius:999px}
+.nk-cta-obrys-tmavy{background:none;box-shadow:none;color:var(--nejtmavsi);
+  border:2px solid var(--nejtmavsi);padding:15px 32px}
+.nk-cta-odkaz-bily{background:none;box-shadow:none;color:var(--bila);padding:6px 0;
+  border-radius:0;border-bottom:2px solid var(--bila);text-transform:none;letter-spacing:0}
+.nk-cta-stin{box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.nk-cta-plocha{box-shadow:none;background:var(--karta);color:var(--bila);
+  border:1px solid var(--linka)}
+.nk-cta-sipka::after{content:" →"}
+/* Tlačítko podle šablony. Uzel s vlastní barvou, pozadím nebo zaoblením si
+   vzhled nese sám – brandový pill by mu ho jen přebil, proto tady padá
+   gradient, verzálky, prostrkání i záře (a ta i pod myší). Pravidla se
+   dopisují níž, ať mají třídy i pravidla uzlů stejné deklarace. */
+
+/* Vyskakovací okno. V editoru se kreslí rozbalené, ať jde upravovat. */
+.nk-popup{position:fixed;inset:0;z-index:60;display:flex;align-items:center;
+  justify-content:center;padding:20px}
+.nk-popup[hidden]{display:none}
+.nk-popup-kryt{position:absolute;inset:0;background:rgba(0,14,36,.72)}
+.nk-popup-okno{position:relative;max-width:var(--popup-sirka,560px);width:100%;max-height:86vh;
+  overflow:auto;padding:32px;border-radius:18px;background:var(--vrstva);
+  border:1px solid var(--linka);box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.nk-popup-zavri{position:absolute;top:12px;right:12px;width:32px;height:32px;
+  border:0;border-radius:50%;background:var(--karta);color:var(--bila);cursor:pointer}
+.nk-popup-editor{position:static;padding:0;display:block}
+.nk-popup-editor .nk-popup-okno{max-height:none;margin:0 auto}
+
+/* Obrázek. Bez max-width vytlačí široký soubor celý sloupec ze stránky. */
+.nk-obrazek img{max-width:100%;height:auto;display:block;border-radius:inherit}
+.nk-obrazek-odkaz{display:block}
+.nk-nahled-spoust{cursor:zoom-in}
+/* Lupa nad obrázkem. Vrstvu staví formular.js až po kliknutí. */
+.nk-nahled{position:fixed;inset:0;z-index:70;display:flex;align-items:center;
+  justify-content:center;padding:24px;background:rgba(0,14,36,.86);cursor:zoom-out}
+.nk-nahled img{max-width:100%;max-height:100%;border-radius:12px}
+
+.nk-nowrap{white-space:nowrap}
+
+/* Linka má vlastní props a ty se zapisují jen na horní hranu – obecný rámeček
+   ze STYL_MAPA by z linky udělal obdélník. */
+.nk-linka{margin-block:18px}
+
+/* Seznam. Odrážka se kreslí přes ::before, takže barvu i velikost řídí
+   proměnné z panelu a v HTML nezůstane znak navíc. */
+.nk-seznam{list-style:none;margin:0;padding:0;counter-reset:nk-li}
+.nk-li{display:flex;align-items:flex-start;gap:8px;margin:0 0 var(--list-mezera,8px)}
+.nk-li:last-child{margin-bottom:0}
+.nk-seznam-stred .nk-li{justify-content:center}
+.nk-seznam-vpravo .nk-li{justify-content:flex-end}
+.nk-li::before{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-width:1.4em;height:1.4em;line-height:1;
+  font-size:var(--list-ikona-velikost,18px);color:var(--list-ikona-barva,var(--cyan));
+  background:var(--list-ikona-pozadi,rgba(0,0,0,0));border-radius:50%}
+.nk-li-fajfka::before{content:"✓"}
+.nk-li-fajfka-v-krouzku::before{content:"✓";border:2px solid currentColor}
+.nk-li-tecka::before{content:"•"}
+.nk-li-krouzek::before{content:"○"}
+.nk-li-ctverec::before{content:"▪"}
+.nk-li-sipka::before{content:"→"}
+.nk-li-hvezda::before{content:"★"}
+.nk-li-pomlcka::before{content:"–"}
+.nk-li-cislo::before{counter-increment:nk-li;content:counter(nk-li) ".";
+  min-width:1.8em;font-variant-numeric:tabular-nums}
+
+/* Textové efekty z lišty editoru. Kreslí se stejně na živé stránce i v náhledu. */
+.nk-zvyr{background:linear-gradient(transparent 58%,var(--zluta) 58%);
+  color:var(--nejtmavsi);padding:0 2px;border-radius:2px}
+.nk-podtrh{background-image:linear-gradient(90deg,var(--zluta),var(--zluta));
+  background-repeat:no-repeat;background-position:0 100%;background-size:100% 3px;
+  padding-bottom:3px}
+.nk-krouzek{position:relative;display:inline-block;padding:0 .28em}
+.nk-krouzek::after{content:"";position:absolute;inset:-38% -6%;border:2px solid var(--zluta);
+  border-radius:50%;transform:rotate(-3deg);pointer-events:none}
+.nk-velka{text-transform:uppercase;letter-spacing:.04em}
+.nk-barva-1{color:var(--zluta)}
+.nk-barva-2{color:var(--cyan)}
+.nk-barva-3{color:var(--seda)}
+.nk-barva-4{color:var(--zelena)}
+
+.nk-cta-vlastni{text-transform:none;letter-spacing:normal;box-shadow:none}
+.nk-cta-vlastni:hover,.nk-cta-vlastni:focus-visible{box-shadow:none}
+.nk-cta-vlastni-pozadi{background-image:none;background-color:transparent}
+@media(max-width:620px){
+  .nk-cta-m-vlastni{text-transform:none;letter-spacing:normal;box-shadow:none}
+  .nk-cta-m-vlastni:hover,.nk-cta-m-vlastni:focus-visible{box-shadow:none}
+  .nk-cta-m-vlastni-pozadi{background-image:none;background-color:transparent}}

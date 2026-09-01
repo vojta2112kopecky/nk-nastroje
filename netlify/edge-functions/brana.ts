@@ -8,6 +8,7 @@
  */
 
 const COOKIE = "nk_brana";
+const VEREJNA_STATIKA = new Set(["/brand.css", "/formular.js", "/komponenty.css"]);
 const PLATNOST = 60 * 60 * 24 * 30;   // 30 dní
 
 async function podpis(hodnota: string, tajemstvi: string): Promise<string> {
@@ -57,6 +58,14 @@ button:hover{filter:brightness(1.07)}
 }
 
 export default async (request: Request) => {
+  // Publikované stránky funnelů a odesílání formulářů jsou veřejné – heslo
+  // na nich by zabilo celý smysl. Rozpracovaný koncept veřejný není.
+  const kam = new URL(request.url).pathname;
+  if (kam === "/builder/api/lead") return;
+  // Statika publikovaných stránek. Za heslem by z funnelu zbyl holý text.
+  if (VEREJNA_STATIKA.has(kam) || kam.startsWith("/fonts/")) return;
+  if (kam.startsWith("/builder/p/") && !kam.replace(/\/+$/, "").endsWith("/koncept")) return;
+
   const heslo = Deno.env.get("NK_HESLO");
   if (!heslo) return;                       // bez nastaveného hesla bránu nezavíráme
 

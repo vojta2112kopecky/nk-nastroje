@@ -1,0 +1,233 @@
+/*
+ * NK – design systém podle Iman Gadzhi funnel brandu.
+ *
+ * Zdroj: Vojtův board BRAND (miro.com/app/board/uXjVIHfOzhY=) a podklady,
+ * ze kterých vznikl – ~/Documents/outputs/brand_maker/. Nic tu není odhadnuté.
+ *
+ * ROLE FONTŮ (přesně jak je má board rozdělené):
+ *   Mona Sans        základní sans celého funnelu   nadpisy, běžný text
+ *   Instrument Sans  UI texty, tlačítka, formuláře  CTA, inputy, labely, chipy
+ *   Space Grotesk    tech akcenty, čísla, badge     badge, číselné údaje
+ *
+ * BARVY: vzorkované z reálného renderu registrační stránky, s podílem plochy.
+ */
+
+@font-face {
+  font-family: "Mona Sans";
+  src: url("/fonts/MonaSans.woff2") format("woff2-variations");
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+  font-display: swap;
+}
+
+:root {
+  /* Master paleta funnelu z brandbooku */
+  --podklad:   #001A16;
+  --vrstva:    #014040;   /* deep teal */
+  --nejtmavsi: #000E24;   /* navy */
+  --cyan:      #2EFFFF;
+
+  --zlata:     #2EFFFF;   /* akcent = neon cyan */
+  --zluta:     #F8FF29;   /* zvýraznění a CTA */
+  --zelena:    #00A856;
+
+  /* CTA gradient a glow – hodnoty 1:1 z jeho CSS */
+  --cta-top:   #E9FF8F;
+  --cta-bot:   #F8FF29;
+  --cta-glow:  rgba(237, 255, 41, .15);
+
+  --live:      #F04436;
+  --bila:      #E5FFFF;
+  --seda:      #79A6A2;
+  --linka:     rgba(46, 255, 255, .15);
+  --karta:     rgba(1, 64, 64, .34);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--podklad);
+  color: var(--bila);
+  /* Mona Sans = základní sans celého funnelu */
+  font: 400 17px/1.6 "Mona Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* --- Pódium: zelené světlo zespoda ------------------------------------- */
+
+.jeviste { position: relative; isolation: isolate; overflow: hidden; }
+.jeviste::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -2;
+  background-image:
+    linear-gradient(var(--linka) 1px, transparent 1px),
+    linear-gradient(90deg, var(--linka) 1px, transparent 1px);
+  background-size: 132px 88px;
+  opacity: .45;
+  mask-image: radial-gradient(120% 90% at 50% 30%, #000 20%, transparent 78%);
+}
+.jeviste::after {
+  content: "";
+  position: absolute; z-index: -1;
+  left: 50%; bottom: -300px;
+  width: 160%; height: 620px;
+  transform: translateX(-50%);
+  background: radial-gradient(50% 50% at 50% 50%, rgba(55, 117, 82, .55) 0%, rgba(55, 117, 82, .16) 45%, transparent 72%);
+  pointer-events: none;
+}
+
+/* --- Typografie: Mona Sans -------------------------------------------- */
+
+.wrap { max-width: 780px; margin: 0 auto; padding: 0 22px; }
+.uzky { max-width: 620px; }
+
+h1, h2, h3 {
+  font-family: "Mona Sans", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+  margin: 0;
+}
+h1 { font-size: clamp(32px, 5.4vw, 48px); line-height: 1.14; }
+h2 { font-size: clamp(27px, 4vw, 38px); line-height: 1.18; margin-bottom: 14px; }
+h3 { font-size: 19px; line-height: 1.3; }
+
+/* Klíčová slova v nadpisu žlutě – jeho podpisový tah. */
+.zvyr { color: var(--zluta); }
+
+p { margin: 0 0 15px; }
+.podnadpis { color: var(--seda); font-size: 16px; max-width: 56ch; }
+
+/* --- Badge: Space Grotesk (tech akcent) -------------------------------- */
+
+.badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: rgba(1, 5, 5, .6);
+  border: 1px solid var(--linka);
+  font-family: "Space Grotesk", monospace;
+  font-size: 12px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.badge .tecka {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--live);
+  box-shadow: 0 0 0 0 rgba(240, 68, 54, .7);
+  animation: pulz 2s infinite;
+}
+@keyframes pulz {
+  70%  { box-shadow: 0 0 0 8px rgba(240, 68, 54, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(240, 68, 54, 0); }
+}
+
+/* --- Tlačítka a formuláře: Instrument Sans ----------------------------- */
+
+.cta {
+  display: inline-block;
+  padding: 17px 34px;
+  border: 0; border-radius: 100px;
+  background: linear-gradient(var(--cta-top) 0%, var(--cta-bot) 100%);
+  box-shadow: var(--cta-glow) 0 18px 48px 0;
+  color: #12140A;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-weight: 600; font-size: 15px;
+  letter-spacing: .04em; text-transform: uppercase;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cta:hover, .cta:focus-visible { transform: translateY(-1px); box-shadow: var(--cta-glow) 0 22px 56px 0; }
+.cta:disabled { opacity: .5; transform: none; cursor: default; }
+.cta-sirka { width: 100%; }
+
+form {
+  background: var(--karta);
+  border: 1px solid var(--linka);
+  border-radius: 16px;
+  padding: 26px;
+}
+label {
+  display: block; margin: 0 0 7px;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-size: 12px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--seda);
+}
+input {
+  width: 100%; padding: 14px 15px; margin-bottom: 18px;
+  background: rgba(1, 5, 5, .5); color: var(--bila);
+  border: 1px solid var(--linka); border-radius: 10px;
+  font: 400 16px/1.3 "Instrument Sans", system-ui, sans-serif;
+}
+input::placeholder { color: #6B7770; }
+input:focus { outline: 2px solid var(--zlata); outline-offset: 1px; border-color: transparent; }
+
+/* --- Trust chipy: taky UI, tedy Instrument Sans ------------------------ */
+
+.chipy { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; margin-top: 18px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-size: 13px; color: var(--seda);
+}
+.chip svg { width: 15px; height: 15px; flex: none; stroke: var(--zelena); }
+
+/* --- Sekce a karty ----------------------------------------------------- */
+
+section { padding: 62px 0; border-top: 1px solid var(--linka); }
+.hero { padding: 74px 0 66px; text-align: center; border: 0; }
+
+.karty { display: grid; gap: 14px; margin-top: 26px; }
+.karta {
+  background: var(--karta);
+  border: 1px solid var(--linka);
+  border-radius: 14px;
+  padding: 20px 22px;
+}
+.karta h3 { margin-bottom: 6px; }
+.karta p { margin: 0; color: var(--seda); font-size: 15.5px; }
+.karta .ikona { display: block; width: 22px; height: 22px; stroke: var(--zelena); margin-bottom: 12px; }
+
+/* Čísla = Space Grotesk, jak to má rozdělené. */
+.cisla { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-top: 26px; }
+.cislo { background: var(--karta); border: 1px solid var(--linka); border-radius: 14px; padding: 20px; text-align: center; }
+.cislo b {
+  display: block;
+  font-family: "Space Grotesk", monospace;
+  font-weight: 700; font-size: 34px; line-height: 1;
+  color: var(--zluta); font-variant-numeric: tabular-nums;
+}
+.cislo span {
+  display: block; margin-top: 8px;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  font-size: 13.5px; color: var(--seda); line-height: 1.4;
+}
+.cislice { font-family: "Space Grotesk", monospace; font-variant-numeric: tabular-nums; }
+
+/* Citace – Mona Sans, jen větší a lehčí. */
+blockquote { margin: 0; padding: 24px; background: var(--karta); border: 1px solid var(--linka); border-radius: 14px; }
+blockquote p { font-size: 19px; line-height: 1.5; margin-bottom: 12px; }
+blockquote footer { font-family: "Instrument Sans", system-ui, sans-serif; font-size: 13.5px; color: var(--seda); }
+
+.hlaska { margin: 14px 0 0; font-size: 15px; min-height: 22px; text-align: center; font-family: "Instrument Sans", system-ui, sans-serif; }
+.hlaska.chyba { color: #FF9B8F; }
+
+footer.pata { padding: 34px 0 48px; color: var(--seda); font-size: 13.5px; border-top: 1px solid var(--linka); font-family: "Instrument Sans", system-ui, sans-serif; }
+footer.pata a { color: var(--seda); }
+
+code {
+  font-family: "Space Grotesk", monospace;
+  background: rgba(1, 5, 5, .5); padding: 2px 6px; border-radius: 4px;
+}
+
+@media (max-width: 620px) {
+  .cta { padding: 16px 22px; font-size: 13.5px; letter-spacing: .02em; }
+  .hero { padding: 56px 0 52px; }
+  .badge { font-size: 11px; padding: 7px 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto; }
+}

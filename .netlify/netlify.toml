@@ -1,11 +1,14 @@
+functionsDirectory = "/Users/vojtech/nk_stack/nk-nastroje-web/netlify/functions"
+functionsDirectoryOrigin = "default"
+redirectsOrigin = "config"
 plugins = []
 headers = []
-redirects = []
 
 [build]
 edge_functions = "/Users/vojtech/nk_stack/nk-nastroje-web/netlify/edge-functions"
-publish = "/Users/vojtech/nk_stack/nk-nastroje-web"
+publish = "/Users/vojtech/nk_stack/nk-nastroje-web/web"
 publishOrigin = "config"
+functions = "/Users/vojtech/nk_stack/nk-nastroje-web/netlify/functions"
 
 [build.environment]
 
@@ -27,4 +30,45 @@ path = "/*"
 
 [functions]
 
+[functions.api]
+external_node_modules = ["pyodide"]
+
 [functions."*"]
+included_files = ["nkpy/**", "pybalicky/**", "node_modules/pyodide/**"]
+node_bundler = "esbuild"
+
+[[redirects]]
+from = "/builder/admin/page/edit/*"
+to = "/builder/editor.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/builder/admin/*"
+to = "/builder/admin.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/builder"
+to = "/builder/admin.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

@@ -1,0 +1,5 @@
+node_modules/
+.netlify/
+# Poskládá se při nasazení ze zdrojů v ~/nk_stack/nk_konverzky.
+nkpy/
+web/builder/

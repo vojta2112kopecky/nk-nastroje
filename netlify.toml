@@ -1,7 +1,31 @@
 [build]
-  publish = "."
+  publish = "web"
+
+[functions]
+  node_bundler = "esbuild"
+  # Pyodide i Python zdrojáky se čtou za běhu ze souborů, bundler je nesmí zahodit.
+  included_files = ["nkpy/**", "pybalicky/**", "node_modules/pyodide/**"]
+
+[functions.api]
+  external_node_modules = ["pyodide"]
 
 # Brána běží před vším ostatním, včetně statických souborů.
 [[edge_functions]]
   function = "brana"
   path = "/*"
+
+# Stavitel je jednostránková aplikace, routing dělá prohlížeč.
+[[redirects]]
+  from = "/builder/admin/page/edit/*"
+  to = "/builder/editor.html"
+  status = 200
+
+[[redirects]]
+  from = "/builder/admin/*"
+  to = "/builder/admin.html"
+  status = 200
+
+[[redirects]]
+  from = "/builder"
+  to = "/builder/admin.html"
+  status = 200

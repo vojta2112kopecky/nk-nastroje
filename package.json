@@ -1,0 +1,9 @@
+{
+  "name": "nk-nastroje-web",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "pyodide": "^0.28.0"
+  }
+}
