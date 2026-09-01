@@ -1,0 +1,61 @@
+/* =====================================================================
+   PICKER OBDOBÍ — doplňky k styles.css (iterace 6, P1–P3)
+   ---------------------------------------------------------------------
+   Načítat AŽ ZA styles.css, jinak `.topbar` override níž prohraje
+   na specificitě/pořadí (obě pravidla mají stejnou váhu).
+
+   Základ pickeru (.period-pop, .pp-quick, .pp-q …) zůstává v styles.css
+   a ZÁMĚRNĚ se ho nedotýkám — Filip: „ten date picker už je vymakanější,
+   to se mi líbí, good job". Tady je jen to, co se rozbilo tím, že rychlé
+   volby přibyly (P2), plus jeden nález z reálného proklikání.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   BUG (nalezeno proklikáním na 1280px, PŮVODNÍ, ne z P2):
+   Rychlé volby byly CELÉ SCHOVANÉ POD SIDEBAREM a nešly kliknout.
+
+   PROČ: `.period-pop` má z-index:40, ale `.topbar` je position:sticky
+   + z-index:30 → topbar zakládá STACKING CONTEXT a z-index:40 popoveru
+   platí jen UVNITŘ něj. Proti sidebaru (`.sidenav`, z-index:35) tak
+   nesoutěží popover (40), ale celý topbar (30) → 30 < 35 → sidebar kreslí
+   přes popover. Zvyšovat z-index na .period-pop je proto k ničemu.
+
+   Popover je 758px široký a kotví se `right:0` k ovladači období uprostřed
+   lišty → na 1280px mu levý okraj vyjde na x=65, tedy pod sidebar (0–224).
+   Filip to nenahlásil, protože na širokém monitoru popover pod sidebar
+   nedosáhne. Na notebooku ano.
+
+   ŘEŠENÍ: povýšit topbar nad sidebar POUZE po dobu otevřeného pickeru
+   (`:has`). Mimo tu chvíli zůstává stacking přesně jak byl → nulový dopad
+   na zbytek dashboardu. Popover překryje menu, což je u dropdownu/dialogu
+   standardní a čekané chování.
+   --------------------------------------------------------------------- */
+.topbar:has(#period-pop:not([hidden])) {
+  z-index: 45;   /* > .sidenav (35); jen když je picker otevřený */
+}
+
+/* ---------------------------------------------------------------------
+   P2 — 7 rychlých voleb (bylo 5) je vyšší sloupec. Vedle 2měsíčního
+   kalendáře se pořád vejde s rezervou, ale na NÍZKÉM okně (notebook na
+   výšku obsahu ~600px) by popover přerostl viewport a spodek — včetně
+   „Použít" — by byl nedosažitelný. Strop + scroll uvnitř sloupce to drží
+   uvnitř obrazovky, aniž by se sáhlo na rozměry, které Filip schválil.
+   `--pp-max-h` = odhad výšky lišty nad popoverem (55px) + rezerva dole.
+   --------------------------------------------------------------------- */
+.period-pop {
+  max-height: calc(100vh - 80px);
+}
+.pp-quick {
+  overflow-y: auto;    /* scroll až KDYŽ se nevejde; jinak se nic nemění */
+  overscroll-behavior: contain;
+}
+
+/* ---------------------------------------------------------------------
+   Na úzkém okně jsou rychlé volby vodorovná řada (styles.css @860px).
+   7 položek se zalomí do víc řádků — ať se dá odscrollovat celý popover
+   a nezůstane useknutý kalendář.
+   --------------------------------------------------------------------- */
+@media (max-width: 860px) {
+  .period-pop { overflow-y: auto; }
+  .pp-quick   { overflow-y: visible; }   /* scrolluje popover jako celek */
+}

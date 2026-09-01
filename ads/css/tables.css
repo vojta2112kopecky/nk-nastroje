@@ -1,0 +1,250 @@
+/* ============================================================================
+   TABULKA — barvy funnelů (T13), stav běží/pauznuto (T9), sumární patička (T8)
+   FEEDBACK-6. Vlastní soubor schválně: styles.css sahá víc modulů a přepisovali
+   bychom si ho navzájem. Načítá se PO styles.css → smí ho přebít.
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   T13 — BARVY FUNNEL PILULEK (Filip 17. 7., doslova):
+     „snubní 30k bude modrý · 100k bude černý · Maledivy bude žluté ·
+      zásnubní bude hnědej · šaty bude takovej červeno růžovej"
+     a k funýlkům: „ne, hovno — ty 100k jakoby fanýlky, to znamená ne přímo 100k,
+      ale je to fotosoutěž, dotazník atd., tak ty budou fialový, ať se to líp rozeznává."
+
+   Třídy `fk-*` staví funnelKindOf() v tables.js (rodinu pozná i bez diakritiky).
+   Barvy MUSÍ sedět s brandColor() v charts.js — stejný funnel, stejná barva všude,
+   jinak si graf a tabulka odporují.
+
+   Pilulka = světlé pozadí + sytý text/okraj: plná výplň by v hustém řádku křičela
+   a Filip by to viděl dřív než čísla, o která jde.
+   --------------------------------------------------------------------------- */
+.chip-funnel { border: 1px solid transparent; font-weight: 600; }
+
+/* snubní 30K — modrá */
+.chip-funnel.fk-snubni    { background: #e8f0fa; color: #22518c; border-color: #c2d8f0; }
+/* zásnubní 49K — hnědá */
+.chip-funnel.fk-zasnubni  { background: #f4ece4; color: #7a4e33; border-color: #e3d0bf; }
+/* 100K (přímo) — černá */
+.chip-funnel.fk-f100      { background: #e6e6e6; color: #1c1c1c; border-color: #c9c9c9; }
+/* 100K funýlky (fotosoutěž, dotazník…) — fialová */
+.chip-funnel.fk-f100soft  { background: #f0ebf8; color: #5b3f8c; border-color: #dccff0; }
+/* Maledivy — žlutá (tmavší text, žlutá na bílé je jinak nečitelná) */
+.chip-funnel.fk-maledivy  { background: #fbf2d8; color: #7d5e07; border-color: #f0e0a8; }
+/* Šaty — červenorůžová */
+.chip-funnel.fk-saty      { background: #fbe9ef; color: #9c2b4e; border-color: #f4ccd9; }
+/* `---` a neznámé → neutrální, ať nekřičí barvou, kterou si nezaslouží */
+.chip-funnel.fk-none,
+.chip-funnel.fk-other     { background: #f0eee9; color: #6f6a5f; border-color: #e0dcd3; }
+
+/* ---------------------------------------------------------------------------
+   T9 — STAV: běží / pauznuto. Filip: „první sloupec by ukazoval, jestli běží.
+   Jenom malá ikonka, ne emoji — zelený kolečko a nebo šedý pause."
+   → CSS tvary, žádné emoji (emoji se na každém OS kreslí jinak a v řádku poskakují).
+   --------------------------------------------------------------------------- */
+.st-dot {
+  display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+  background: #4f9d6b; box-shadow: 0 0 0 2px rgba(79, 157, 107, .18);
+}
+.st-pause {
+  display: inline-block; width: 9px; height: 9px; position: relative; opacity: .55;
+}
+/* dvě svislé čárky = pauza */
+.st-pause::before, .st-pause::after {
+  content: ''; position: absolute; top: 0; width: 3px; height: 9px;
+  background: #8b8577; border-radius: 1px;
+}
+.st-pause::before { left: 0; }
+.st-pause::after  { right: 0; }
+.c-state { text-align: center; }
+
+/* PODVYŽIVENÁ (17. 8.) — Filip nechtěl ikonu, kterou je potřeba luštit („nevím, jestli ten
+   vykřičník znamená, že je, nebo není"). Píše se tedy SLOVO v oranžové pilulce; prázdný
+   stav je „—" jako u ostatních sloupců, takže se to čte bez legendy. */
+.starv {
+  display: inline-block; padding: 1px 8px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600; letter-spacing: .01em;
+  color: #7A4B0B; background: #FBE8CB; border: 1px solid #F0C98A;
+  white-space: nowrap;
+}
+.c-scale { text-align: center; }
+
+/* ---------------------------------------------------------------------------
+   T8 — SUMÁRNÍ PATIČKA. Musí být čitelná na první pohled a jasně oddělená
+   od dat (jinak vypadá jako další řádek kreativy).
+   --------------------------------------------------------------------------- */
+.ads-foot {
+  margin-top: 8px; padding: 10px 12px;
+  background: #faf8f4; border: 1px solid #ece7dd; border-radius: 10px;
+}
+.tf-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
+  font-size: 12.5px;
+}
+.tf-n {
+  font-weight: 700; color: #4a4438; padding-right: 6px;
+  border-right: 1px solid #e5ded1; margin-right: 4px;
+}
+.tf-i { display: inline-flex; align-items: baseline; gap: 6px; cursor: help; }
+.tf-l { color: #8b8577; }
+.tf-v { font-weight: 700; color: #33302a; font-variant-numeric: tabular-nums; }
+.tf-sep {
+  width: 1px; height: 16px; background: #e5ded1; margin: 0 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   T12 — ztmavit texty ~20 %. Filip: „ty názvy těch kreativ… bych to trošku stmavil
+   to písmo, ať se to dobře čte." Původní #8b8577 bylo na krémovém pozadí moc světlé.
+   --------------------------------------------------------------------------- */
+.c-cr .cr-code, .c-cr a { color: #2e2b25; }   /* T12: byl to překlep .c-cre → .c-cr (buňka)/.cr-code (kód) */
+.tabulator .tabulator-col-title { color: #4a4438; }
+.tabulator .tabulator-cell { color: #33302a; }
+.muted { color: #6f6a5f; }
+
+/* ---------------------------------------------------------------------------
+   G8 — přepínač období v grafu kreativy (modal). Filip: „aby tam šlo upravovat
+   to období… abych se mohl u tý jednotlivý kreativy podívat na delší horizont."
+   Sedí v hlavičce modalu vedle názvu, ne dole — musí být vidět dřív než graf.
+   --------------------------------------------------------------------------- */
+.tm-per { display: flex; gap: 4px; margin-left: auto; margin-right: 10px; flex-wrap: wrap; }
+.tm-p {
+  font: inherit; font-size: 11.5px; padding: 4px 9px;
+  background: #fff; border: 1px solid #e0dacd; border-radius: 999px;
+  color: #6f6a5f; cursor: pointer; white-space: nowrap;
+}
+.tm-p:hover  { border-color: #c9bda5; color: #33302a; }
+.tm-p.is-on  { background: #4a55b8; border-color: #4a55b8; color: #fff; font-weight: 600; }
+.tm-mnote:empty { display: none; }
+
+/* G2 — přepínač metrik horního grafu. Sedí v hlavičce vpravo, stejný jazyk jako
+   ostatní segmenty v appce (acx-seg), jen kompaktnější — je jich pět. */
+.acx-wmet { margin-left: auto; }
+.acx-wmet button[hidden] { display: none; }
+
+/* P1-A — chipy funnel filtru v GRAFU (multi-select). */
+.acx-fchips { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* ---------------------------------------------------------------------------
+   FUNNEL CHIPY — přesunuto SEM (z JS-injektovaného bloku tables.js), protože chipy
+   v grafu žijí MIMO `.ads-sec`, kde byly definované proměnné --at-*. Ve výsledku měly
+   v grafu bílé/průhledné pozadí a okraj (Filip: „mizí pozadí, bílý okraj"). Napevno
+   dané barvy + linkovaná CSS = fungují VŠUDE a bez závislosti na pořadí injektování JS.
+   --------------------------------------------------------------------------- */
+.ads-funnels { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.ads-funnels[hidden] { display: none; }
+.ads-toolbar .ads-funnels { flex: 1 1 auto; min-width: 0; }
+.fch-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #8d897f; margin-right: 2px; white-space: nowrap; }
+.fchip {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; margin: 0;
+  background: #fff; color: #2c2b28; border: 1px solid #eceae3; border-radius: 999px;
+  font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1; letter-spacing: -.005em; cursor: pointer;
+  -webkit-appearance: none; appearance: none; max-width: 230px; overflow: hidden; white-space: nowrap;
+  transition: background .12s, border-color .12s, color .12s, box-shadow .12s;
+}
+.fchip .fchip-txt { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fchip .fchk { flex: none; }
+.fchip:hover { background: #faf8f4; border-color: #ddd8cc; }
+.fchip:focus-visible { outline: none; border-color: #c9a9b0; box-shadow: 0 0 0 3px rgba(168, 106, 120, .16); }
+.fchip b {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 17px; padding: 0 5px;
+  background: #f4f1ea; color: #8d897f; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.fchip.is-on { background: #2c2b28; border-color: #2c2b28; color: #fff; }
+.fchip.is-on:hover { background: #1f1e1c; border-color: #1f1e1c; }
+.fchip.is-on b { background: rgba(255, 255, 255, .2); color: #fff; }
+.fch-sum { font-size: 11px; color: #8d897f; white-space: nowrap; }
+
+/* Scale badge (Winners) — bez tohohle měl inline SVG jen viewBox (0 0 12 12) a ŽÁDNOU
+   velikost → prohlížeč ho vykreslil na default ~300×150 px = „obří černá věc" co
+   nafoukla řádek (Filip). Tady dostane rozumnou velikost a barvu. */
+.sc { display: inline-flex; align-items: center; justify-content: center; }
+.sc svg { width: 15px; height: 15px; display: block; }
+.sc-yes { color: #3f8f5f; }
+.sc-maybe { color: #b8860b; }
+.sc .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* Náušnice CPA semafor (Filip: <800 zelená · 800–1000 oranžová · >1000 červená). */
+.cpa-val.cpa-green  { color: #1f9d63; font-weight: 700; }
+.cpa-val.cpa-orange { color: #c99a2e; font-weight: 700; }
+.cpa-val.cpa-red    { color: #d3453f; font-weight: 700; }
+
+/* Detail náušnicové kreativy (Filip: klik → detail). Drží se ve viewportu + scroll uvnitř. */
+.edt-modal { width: min(520px, 94vw); max-height: 88vh; display: flex; flex-direction: column;
+  padding: 0; overflow: hidden; }
+.edt-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  border-bottom: 1px solid #eceae3; flex: none; }
+.edt-code { font-weight: 700; font-size: 15px; color: #2e2b25; flex: 1;
+  font-family: var(--mono, ui-monospace, monospace); }
+.edt-x { border: 0; background: #f2efe9; width: 30px; height: 30px; border-radius: 8px;
+  font-size: 18px; line-height: 1; color: #6f6a5f; cursor: pointer; }
+.edt-x:hover { background: #e7e3da; color: #2e2b25; }
+.edt-body { padding: 14px 16px 16px; overflow-y: auto; overscroll-behavior: contain; }
+.edt-img { display: block; width: 100%; max-height: 300px; object-fit: contain;
+  border-radius: 10px; background: #f6f3ec; margin-bottom: 12px; }
+.edt-noimg { min-height: 160px; display: flex; align-items: center; justify-content: center;
+  color: #9a948a; font-weight: 600; }
+.edt-camp { display: flex; flex-direction: column; gap: 2px; font-size: 11.5px; color: #6f6a5f;
+  margin-bottom: 14px; }
+.edt-camp span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.edt-grp { margin-bottom: 12px; }
+.edt-grp-h { font-size: 12px; font-weight: 700; color: #33302a; margin-bottom: 6px; }
+.edt-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.edt-t { background: #f8f6f1; border: 1px solid #eceae3; border-radius: 9px; padding: 8px 10px;
+  display: flex; flex-direction: column; gap: 2px; }
+.edt-t span { font-size: 11px; color: #8b8577; }
+.edt-t b { font-size: 15px; color: #2e2b25; font-variant-numeric: tabular-nums; }
+.edt-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+
+/* Kampaň / Ad set v rozkliku kreativy — dva řádky pod sebou, ořez ellipsis (názvy bývají dlouhé). */
+.camp-cell { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.35; }
+.camp-cell .camp-c, .camp-cell .camp-a {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11.5px;
+}
+.camp-cell .camp-c { color: #33302a; }
+.camp-cell .camp-a { color: #6f6a5f; }
+
+/* ---------------------------------------------------------------------------
+   T8 — SUMÁRNÍ ŘÁDEK (Tabulator bottomCalc). Zarovnaný pod sloupci, scrolluje
+   s gridem. Vizuálně oddělit od dat, ať nevypadá jako další kreativa.
+   --------------------------------------------------------------------------- */
+.tabulator .tabulator-calcs-holder,
+.tabulator .tabulator-row.tabulator-calcs {
+  background: #faf8f4 !important;
+  border-top: 2px solid #e5ded1;
+  font-weight: 700;
+}
+.tabulator .tabulator-row.tabulator-calcs .tabulator-cell {
+  color: #33302a;
+  font-variant-numeric: tabular-nums;
+  background: #faf8f4 !important;
+}
+.tabulator .tabulator-row.tabulator-calcs .tabulator-cell .cr-thumb,
+.tabulator .tabulator-row.tabulator-calcs .tabulator-cell img { display: none; }
+
+/* ---------------------------------------------------------------------------
+   T11 — KONTEXTOVÉ MENU (pravý klik na řádek). openCtxMenu() v tables.js appendne
+   div.ads-ctx na body; bez tohohle CSS bylo menu NEVIDITELNÉ, a přitom potlačilo
+   nativní menu → Filipovi „pravý klik nefunguje". z-index MUSÍ přebít .ads-modal-ov
+   (10000) i hint-pop (10001) → ≥10002.
+   --------------------------------------------------------------------------- */
+.ads-ctx {
+  position: fixed; z-index: 10002; background: #fff;
+  border: 1px solid #eceae3; border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(30, 25, 15, .18);
+  padding: 5px; min-width: 210px;
+  opacity: 0; transform: translateY(3px);
+  transition: opacity .12s, transform .12s; pointer-events: none;
+}
+.ads-ctx.show { opacity: 1; transform: none; pointer-events: auto; }
+.ctx-i {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 7px 10px; border: 0; background: transparent; border-radius: 7px;
+  font: inherit; font-size: 13px; color: #2e2b25; cursor: pointer; text-align: left;
+}
+.ctx-i:hover { background: #f6f1ea; }
+.ctx-i[disabled], .ctx-i.is-off { opacity: .4; cursor: not-allowed; }
+.ctx-i[disabled]:hover, .ctx-i.is-off:hover { background: transparent; }
+.ctx-ico { width: 16px; text-align: center; }
+.ctx-tx { flex: 1; }
+.ctx-why { display: block; font-style: normal; font-size: 11px; color: #9a948a; }
+.ctx-sep { height: 1px; background: #eceae3; margin: 4px 6px; }

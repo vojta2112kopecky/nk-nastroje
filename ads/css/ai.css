@@ -1,0 +1,198 @@
+/* ============================================================================
+   AI ASISTENT — drawer zprava. (FEEDBACK-6 §A)
+   Drawer, ne modal: Filip se ptá na to, na co zrovna kouká → data musí zůstat vidět.
+   ============================================================================ */
+
+/* Tlačítko v patičce sidebaru (nad user-chip) */
+.ai-open {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  box-sizing: border-box; width: calc(100% - 16px);
+  margin: 0 8px 10px; padding: 7px 10px;   /* boční mezera jako u ostatních položek */
+  background: linear-gradient(135deg, #f3efff 0%, #fdf6e9 100%);
+  border: 1px solid #e2d8f5; border-radius: 9px;
+  font: inherit; font-size: 12.5px; font-weight: 600; color: #4a3d6b;
+  cursor: pointer; transition: box-shadow .15s, transform .05s;
+}
+.ai-open:hover  { box-shadow: 0 2px 10px rgba(90, 60, 160, .16); }
+.ai-open:active { transform: translateY(1px); }
+.ai-open-i { font-size: 15px; line-height: 1; }
+/* sbalený sidebar → jen ikonka (stejná logika jako u ostatních položek menu) */
+.sidenav.is-collapsed .ai-open-t { display: none; }
+.sidenav.is-collapsed .ai-open   { justify-content: center; padding: 9px 0; }
+
+/* Bublina (FAB) vpravo dole ------------------------------------------------ */
+.ai-fab {
+  position: fixed; right: 22px; bottom: 22px; z-index: 940;
+  width: 58px; height: 58px; border-radius: 50%; border: 0; cursor: pointer;
+  background: linear-gradient(135deg, #6b5bd6 0%, #8f5bd0 100%);
+  box-shadow: 0 6px 20px rgba(80, 55, 160, .38), 0 2px 6px rgba(0,0,0,.12);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .18s cubic-bezier(.2,.9,.3,1.1), box-shadow .18s;
+}
+.ai-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 10px 26px rgba(80,55,160,.46); }
+.ai-fab:active { transform: scale(.96); }
+.ai-fab-ico {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 24px; line-height: 1; color: #fff;
+  transition: opacity .16s, transform .2s cubic-bezier(.2,.9,.3,1.1);
+}
+.ai-fab-close { font-size: 30px; opacity: 0; transform: rotate(-90deg) scale(.6); }
+.ai-fab-spark { opacity: 1; transform: rotate(0) scale(1); }
+.ai-fab.is-open .ai-fab-spark { opacity: 0; transform: rotate(90deg) scale(.6); }
+.ai-fab.is-open .ai-fab-close { opacity: 1; transform: rotate(0) scale(1); }
+.ai-fab-badge {
+  position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px;
+  box-sizing: border-box; border-radius: 999px; background: #e5484d; border: 2px solid #fffdf9;
+  color: #fff; font-size: 11px; font-weight: 800; line-height: 16px; text-align: center;
+  animation: ai-badge-pop .28s cubic-bezier(.2,.9,.3,1.4);
+}
+.ai-fab-badge[hidden] { display: none; }
+@keyframes ai-badge-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+/* Chat popup (nad bublinou) ------------------------------------------------ */
+.ai-drawer {
+  position: fixed; right: 22px; bottom: 92px; z-index: 900;
+  width: min(410px, calc(100vw - 32px)); height: min(620px, calc(100vh - 130px));
+  background: #fffdf9; border: 1px solid #e8e2d6; border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(30, 20, 60, .22), 0 4px 12px rgba(0,0,0,.08);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform-origin: bottom right;
+  opacity: 0; transform: translateY(14px) scale(.94); pointer-events: none;
+  transition: opacity .18s ease, transform .22s cubic-bezier(.2,.9,.3,1.12);
+}
+.ai-drawer.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.ai-drawer[hidden] { display: none; }
+.ai-head:first-child { border-radius: 16px 16px 0 0; }
+
+.ai-head {
+  display: flex; align-items: center; gap: 9px;
+  padding: 12px 14px; border-bottom: 1px solid #eee8dc; background: #faf7f1;
+}
+.ai-h-t { font-weight: 700; color: #33302a; }
+.ai-h-m {
+  font-size: 10.5px; color: #6f5b95; background: #f1ecfa;
+  padding: 2px 7px; border-radius: 999px; border: 1px solid #e2d8f5;
+}
+.ai-clear {
+  margin-left: auto; background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 11.5px; color: #8b8577; text-decoration: underline;
+}
+.ai-clear:hover { color: #33302a; }
+.ai-x {
+  background: none; border: 0; font-size: 22px; line-height: 1;
+  color: #8b8577; cursor: pointer; padding: 0 2px;
+}
+.ai-x:hover { color: #33302a; }
+
+/* Filip: scroll v chatu přetékal do pozadí. min-height:0 = flex-položka smí scrollovat;
+   overscroll-behavior:contain = kolečko nad chatem scrolluje CHAT, ne stránku za ním.
+   (Panel schválně NEzamykáme jako modal — pozadí má zůstat použitelné.) */
+.ai-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px; }
+
+/* Zprávy ------------------------------------------------------------------- */
+.ai-m { margin-bottom: 14px; }
+.ai-b { font-size: 13.5px; line-height: 1.55; color: #2e2b25; }
+.ai-me { display: flex; justify-content: flex-end; }
+.ai-me .ai-b {
+  background: #4a55b8; color: #fff; padding: 9px 12px;
+  border-radius: 12px 12px 3px 12px; max-width: 85%; white-space: pre-wrap;
+}
+.ai-ai .ai-b {
+  background: #fff; border: 1px solid #ece7dd; padding: 11px 13px;
+  border-radius: 12px 12px 12px 3px;
+}
+.ai-ai .ai-b p  { margin: 0 0 8px; }
+.ai-ai .ai-b p:last-child { margin-bottom: 0; }
+.ai-ai .ai-b ul { margin: 6px 0; padding-left: 18px; }
+.ai-ai .ai-b li { margin: 3px 0; }
+.ai-ai .ai-b code {
+  background: #f4f1ea; padding: 1px 5px; border-radius: 4px; font-size: 12px;
+}
+.ai-pre {
+  background: #f4f1ea; padding: 9px 11px; border-radius: 7px;
+  overflow-x: auto; font-size: 12px; margin: 7px 0;
+}
+
+/* Odkud AI čerpala — Filip čte data kriticky, tohle je pro něj, ne dekorace */
+.ai-tools {
+  font-size: 10.5px; color: #8b8577; margin-bottom: 5px;
+  background: #f6f3ec; display: inline-block; padding: 2px 8px; border-radius: 999px;
+}
+
+/* Myslí ------------------------------------------------------------------- */
+.ai-think { color: #6f6a5f; font-style: italic; }
+.ai-slow { font-size: 11px; color: #a29b8d; margin-top: 4px; font-style: normal; }
+.ai-dots i {
+  display: inline-block; width: 5px; height: 5px; margin-right: 2px;
+  background: #a29b8d; border-radius: 50%; animation: ai-b 1.2s infinite;
+}
+.ai-dots i:nth-child(2) { animation-delay: .2s; }
+.ai-dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes ai-b { 0%, 60%, 100% { opacity: .3 } 30% { opacity: 1 } }
+
+/* Prázdný stav + tipy ------------------------------------------------------ */
+.ai-empty { padding: 22px 6px; text-align: center; }
+.ai-empty-t { font-weight: 700; color: #33302a; margin-bottom: 6px; }
+.ai-empty-d { font-size: 12.5px; color: #6f6a5f; line-height: 1.5; margin-bottom: 16px; }
+.ai-tips { display: flex; flex-direction: column; gap: 7px; }
+.ai-tip {
+  background: #fff; border: 1px solid #e8e2d6; border-radius: 8px;
+  padding: 8px 11px; font: inherit; font-size: 12.5px; color: #4a4438;
+  text-align: left; cursor: pointer;
+}
+.ai-tip:hover { border-color: #c9bda5; background: #fcfaf6; }
+
+/* Návrh změny nastavení ---------------------------------------------------- */
+.ai-prop {
+  margin-top: 9px; border: 1px solid #e2d8f5; border-radius: 10px;
+  background: #fbf9ff; overflow: hidden;
+}
+.ai-prop-h {
+  font-size: 11px; font-weight: 700; color: #6f5b95;
+  background: #f3efff; padding: 5px 11px; border-bottom: 1px solid #e8e0f8;
+}
+.ai-prop-b { padding: 10px 11px 4px; font-size: 13px; color: #2e2b25; }
+.ai-prop-old { color: #8b8577; text-decoration: line-through; }
+.ai-prop-arr { margin: 0 7px; color: #8b8577; }
+.ai-prop-new { font-weight: 700; color: #3f8f5f; }
+.ai-prop-why { padding: 0 11px 9px; font-size: 12px; color: #6f6a5f; line-height: 1.45; }
+.ai-prop-a { display: flex; gap: 7px; padding: 0 11px 11px; }
+.ai-prop-done {
+  padding: 11px; font-size: 12.5px; font-weight: 600; color: #3f8f5f; text-align: center;
+}
+.ai-prop-skip { color: #8b8577; font-weight: 400; }
+
+/* Vstup -------------------------------------------------------------------- */
+.ai-foot {
+  display: flex; gap: 8px; align-items: flex-end;
+  padding: 11px 12px; border-top: 1px solid #eee8dc; background: #faf7f1;
+}
+.ai-in {
+  flex: 1; resize: none; font: inherit; font-size: 13.5px; line-height: 1.45;
+  padding: 9px 11px; border: 1px solid #ddd6c8; border-radius: 9px;
+  background: #fff; color: #2e2b25; max-height: 140px; overflow-y: auto;
+  overscroll-behavior: contain;   /* dlouhý input taky nepřetéká do pozadí */
+}
+.ai-in:focus { outline: 2px solid #b9aee0; outline-offset: -1px; border-color: #b9aee0; }
+.ai-send {
+  width: 36px; height: 36px; flex: none; border: 0; border-radius: 9px;
+  background: #4a55b8; color: #fff; font-size: 16px; cursor: pointer;
+}
+.ai-send:hover { background: #3c46a0; }
+
+@media (max-width: 700px) {
+  .ai-fab { right: 16px; bottom: 16px; }
+  .ai-drawer {
+    right: 12px; left: 12px; bottom: 84px; width: auto;
+    height: min(70vh, calc(100vh - 110px));
+  }
+}
+
+/* Nadpisy a číslované odrážky v odpovědi — model je používá běžně („### Jak tomu
+   předcházet?", „1. Dělejte denní HECK"). Bez toho v chatu svítilo holé „###". */
+.ai-h3 {
+  font-weight: 700; color: #33302a; font-size: 13px;
+  margin: 12px 0 5px; padding-top: 8px; border-top: 1px solid #f0ece3;
+}
+.ai-b p:first-child .ai-h3, .ai-b > .ai-h3:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.ai-b li.ai-li-n { list-style: decimal; }

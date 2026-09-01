@@ -1,0 +1,1138 @@
+/* =====================================================================
+   NK Ads Dashboard — design systém (LIGHT)
+   Krémově-bílá / šedá, akcent tlumená indigo/modrá, žádná zlatá.
+   Vlastník: Frontend SHELL. Konzumují: tables.js, charts.js, wizard.js.
+   ===================================================================== */
+
+:root{
+  /* --- Plochy / pozadí --- */
+  --bg:            #f6f5f1;   /* krémově-bílá stránka */
+  --bg-2:          #efeee9;   /* jemně tmavší sekce */
+  --surface:       #ffffff;   /* karty */
+  --surface-2:     #faf9f6;   /* vnořené plochy, hlavičky tabulek */
+  --surface-3:     #f2f1ec;   /* hover řádků, skeletony */
+
+  /* --- Okraje --- */
+  --border:        #e7e4dc;
+  --border-strong: #d7d3c8;
+  --border-focus:  #b9bff0;
+
+  /* --- Text --- */
+  --text:          #23262e;
+  --text-2:        #565b66;   /* sekundární */
+  --text-3:        #8b8f99;   /* faint / popisky */
+  --text-inv:      #ffffff;
+
+  /* --- Akcent (tlumená indigo/modrá) --- */
+  --accent:        #4b58c9;
+  --accent-600:    #3f4bb4;
+  --accent-700:    #343e97;
+  --accent-weak:   #eceefb;
+  --accent-weak-2: #e0e3f7;
+
+  /* --- Semafor (ROAS_model) --- */
+  --green:   #1f9d63;  --green-bg:   #e4f5ec;  --green-bd:   #bfe6d1;
+  --lgreen:  #6bb583;  --lgreen-bg:  #ecf6ef;  --lgreen-bd:  #cfe6d7;
+  --yellow:  #c99a2e;  --yellow-bg:  #fbf3dd;  --yellow-bd:  #eeddab;
+  --orange:  #d97a34;  --orange-bg:  #fceaddff;--orange-bd:  #f2cfab;
+  --red:     #d3453f;  --red-bg:     #fbe6e4;  --red-bd:     #f2c1bd;
+
+  /* stavové (info/warn) */
+  --info:    #3d7bd0;  --info-bg:    #e7f0fb;  --info-bd:    #c3ddf4;
+
+  /* --- Stíny --- */
+  --shadow-xs: 0 1px 2px rgba(30,28,24,.05);
+  --shadow-sm: 0 1px 3px rgba(30,28,24,.07), 0 1px 2px rgba(30,28,24,.04);
+  --shadow-md: 0 4px 14px rgba(30,28,24,.09), 0 2px 5px rgba(30,28,24,.05);
+  --shadow-lg: 0 18px 48px rgba(24,22,18,.20), 0 6px 16px rgba(24,22,18,.12);
+
+  /* --- Radiusy --- */
+  --r-xs: 6px;
+  --r-sm: 9px;
+  --r-md: 13px;
+  --r-lg: 18px;
+  --r-pill: 999px;
+
+  /* --- Spacing scale --- */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 44px;
+
+  /* --- Typografie --- */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Inter", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --topbar-h: 60px;
+  /* FEEDBACK C2: dashboard na plnou šířku prohlížeče. Dřív 1440px → na velkém monitoru
+     zbytečně úzký sloupec a vodorovné scrollování v tabulkách. Strop 2200px je jen
+     pojistka proti nečitelně dlouhým řádkům na ultrawide. Boční padding = --s-6 (24px). */
+  --content-max: min(100%, 2200px);
+  --gutter: var(--s-6);
+
+  /* N1 sidebar */
+  --sn-w: 224px;        /* rozbalený */
+  --sn-w-min: 60px;     /* sbalený na ikony */
+}
+
+/* --- Reset (nad rámec harness resetu) ------------------------------- */
+*, *::before, *::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  font-family:var(--font);
+  font-size:14px;
+  line-height:1.5;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+h1,h2,h3,h4{ margin:0; font-weight:650; letter-spacing:-.01em; }
+button{ font-family:inherit; }
+[hidden]{ display:none !important; }
+a{ color:var(--accent); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+::selection{ background:var(--accent-weak-2); }
+
+/* Scrollbary jemné */
+*::-webkit-scrollbar{ height:10px; width:10px; }
+*::-webkit-scrollbar-thumb{ background:#d8d5cc; border-radius:8px; border:2px solid transparent; background-clip:content-box; }
+*::-webkit-scrollbar-thumb:hover{ background:#c3bfb3; background-clip:content-box; }
+
+/* =====================================================================
+   TLAČÍTKA
+   ---------------------------------------------------------------------
+   Filip (iterace 5): „nechci … tlačítka z Windows 2000."
+   Pravidla, kterými se to tady drží:
+     • JEDEN tvar (r-sm) a JEDNA výška (36 / sm 30) — ne každý knoflík jinak
+     • plocha místo 3D: 1px rámeček + jemný stín, žádný bevel/gradient
+     • stav se pozná: hover (plocha ztmavne) · active (posun o 1px)
+       · focus-visible (3px accent kroužek — ne nativní modrý outline)
+       · disabled (průhlednost + not-allowed)
+   Vendor knoflíky (Tabulator stránkování) přebíjí tables.js ve svém CSS.
+   ===================================================================== */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--s-2);
+  height:36px; padding:0 var(--s-4);
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-sm);
+  background:var(--surface);
+  color:var(--text);
+  font-size:13.5px; font-weight:600;
+  cursor:pointer;
+  transition:background .14s ease, border-color .14s ease, box-shadow .14s ease, transform .04s ease;
+  white-space:nowrap; user-select:none;
+  -webkit-appearance:none; appearance:none;   /* iOS/Safari jinak dokreslí vlastní chrome */
+}
+.btn:hover{ background:var(--surface-2); border-color:var(--border-strong); box-shadow:var(--shadow-xs); }
+.btn:active{ transform:translateY(1px); }
+.btn:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--accent-weak-2); border-color:var(--border-focus); }
+.btn:disabled{ opacity:.55; cursor:not-allowed; }
+.btn:disabled:hover{ background:var(--surface); box-shadow:none; }   /* zakázané tlačítko nesmí reagovat */
+.btn:disabled:active{ transform:none; }
+
+.btn-primary{ background:var(--accent); border-color:var(--accent); color:var(--text-inv); }
+.btn-primary:hover{ background:var(--accent-600); border-color:var(--accent-600); box-shadow:var(--shadow-sm); }
+.btn-primary:focus-visible{ box-shadow:0 0 0 3px var(--accent-weak-2); }
+.btn-primary:disabled:hover{ background:var(--accent); }
+
+.btn-ghost{ background:transparent; border-color:transparent; }
+.btn-ghost:hover{ background:var(--surface-3); border-color:transparent; }
+
+.btn-danger{ background:var(--red); border-color:var(--red); color:#fff; }
+.btn-danger:hover{ background:#c23a34; border-color:#c23a34; }
+
+.btn-block{ width:100%; }
+.btn-sm{ height:30px; padding:0 var(--s-3); font-size:12.5px; }
+.btn-icon{ padding:0; width:34px; }
+
+/* =====================================================================
+   LOGIN GATE
+   ===================================================================== */
+.login-gate{
+  position:fixed; inset:0; z-index:60;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:var(--s-5);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #fffdf8 0%, var(--bg) 55%),
+    var(--bg);
+  padding:var(--s-5);
+}
+.login-card{
+  width:100%; max-width:380px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-md);
+  padding:var(--s-7) var(--s-6) var(--s-6);
+  display:flex; flex-direction:column; gap:var(--s-3);
+}
+.login-logo{
+  font-size:26px; font-weight:750; letter-spacing:.04em; color:var(--text);
+  text-align:center;
+}
+.login-logo span{ color:var(--accent); font-weight:650; letter-spacing:-.01em; }
+.login-sub{ margin:0 0 var(--s-3); text-align:center; color:var(--text-3); font-size:13px; }
+.field-label{ font-size:12px; font-weight:650; color:var(--text-2); margin-top:var(--s-2); }
+/* Inputy: stejný jazyk jako tlačítka (rámeček + radius + accent focus kroužek).
+   `appearance:none` = pryč s nativním chrome (Safari jinak dokreslí vlastní rámeček
+   a inset stín → přesně ten „Windows 2000" vzhled). */
+.input{
+  height:42px; padding:0 var(--s-4);
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-sm);
+  background:var(--surface-2);
+  color:var(--text); font-size:15px; font-family:inherit;
+  -webkit-appearance:none; appearance:none;
+  transition:border-color .14s, box-shadow .14s, background .14s;
+}
+.input::placeholder{ color:var(--text-3); }
+.input:focus{ outline:none; background:var(--surface); border-color:var(--border-focus); box-shadow:0 0 0 3px var(--accent-weak); }
+.input:disabled{ opacity:.6; cursor:not-allowed; }
+.user-switch{ display:flex; gap:var(--s-2); }
+.user-switch .user-pill{
+  flex:1; height:40px; border:1px solid var(--border-strong); border-radius:var(--r-sm);
+  background:var(--surface-2); color:var(--text-2); font-weight:650; font-size:14px; cursor:pointer;
+  transition:all .14s;
+}
+.user-switch .user-pill:hover{ background:var(--surface-3); }
+.user-switch .user-pill.is-active{
+  background:var(--accent-weak); border-color:var(--accent); color:var(--accent-700);
+  box-shadow:inset 0 0 0 1px var(--accent);
+}
+.login-error{ min-height:18px; color:var(--red); font-size:12.5px; font-weight:600; text-align:center; }
+.login-foot{ color:var(--text-3); font-size:11.5px; letter-spacing:.02em; }
+
+/* =====================================================================
+   N1 — SIDEBAR (menu)
+   ---------------------------------------------------------------------
+   Filip: „budeme to furt rozšiřovat, tak by tam mělo být menu."
+   Layout: .app = flex řádek [sidebar | .app-main]. Sidebar je sticky přes
+   celou výšku okna a scrolluje si sám; topbar zůstává sticky uvnitř
+   .app-main, takže se při scrollu chová jako dřív.
+
+   Sbalení na ikony: .app.nav-collapsed (tlačítko, persistuje v localStorage)
+   NEBO automaticky pod 1180px (media query níž) — na užším okně by menu
+   ukusovalo z tabulek, které Filip potřebuje široké.
+   ===================================================================== */
+.app{ min-height:100vh; display:flex; align-items:flex-start; }
+.app-main{ flex:1; min-width:0; display:flex; flex-direction:column; min-height:100vh; }
+
+.sidenav{
+  position:sticky; top:0; z-index:35;
+  flex:none; width:var(--sn-w); height:100vh;
+  display:flex; flex-direction:column;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  transition:width .16s ease;
+}
+.sn-head{
+  display:flex; align-items:center; gap:var(--s-2);
+  height:var(--topbar-h); flex:none;
+  padding:0 var(--s-3) 0 var(--s-4);
+  border-bottom:1px solid var(--border);
+}
+.sn-head .brand{ flex:1; min-width:0; overflow:hidden; }
+/* Značka pro sbalený stav — viditelná jen tam (pravidla níž), jinak display:none */
+.brand-mini{
+  display:none;
+  width:30px; height:30px; border-radius:8px;
+  align-items:center; justify-content:center;
+  background:var(--accent); color:#fff;
+  font-size:14px; font-weight:750; letter-spacing:.02em;
+}
+
+/* Sbalovací tlačítko — kreslená dvojšipka, ne znak z fontu (ostré v každém zoomu) */
+.sn-toggle{
+  flex:none; width:28px; height:28px; padding:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid transparent; border-radius:var(--r-sm);
+  background:transparent; cursor:pointer;
+  transition:background .12s, border-color .12s;
+}
+.sn-toggle:hover{ background:var(--surface-3); border-color:var(--border); }
+.sn-toggle:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--accent-weak-2); border-color:var(--border-focus); }
+.sn-toggle-ico{
+  width:8px; height:8px;
+  border-left:2px solid var(--text-3); border-bottom:2px solid var(--text-3);
+  border-radius:1px;
+  transform:rotate(45deg) translate(1px,-1px);
+  transition:transform .16s ease, border-color .12s;
+}
+.sn-toggle:hover .sn-toggle-ico{ border-color:var(--text); }
+.nav-collapsed .sn-toggle-ico{ transform:rotate(-135deg) translate(1px,-1px); }
+
+.sn-nav{
+  flex:1; min-height:0; overflow-y:auto; overflow-x:hidden;
+  padding:var(--s-3) var(--s-2);
+  display:flex; flex-direction:column; gap:2px;
+}
+.sn-item{
+  display:flex; align-items:center; gap:var(--s-3);
+  height:40px; padding:0 var(--s-3);
+  border-radius:var(--r-sm);
+  color:var(--text-2); font-size:13.5px; font-weight:600;
+  text-decoration:none; white-space:nowrap;
+  transition:background .12s, color .12s;
+}
+.sn-item:hover{ background:var(--surface-3); color:var(--text); text-decoration:none; }
+.sn-item:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--accent-weak-2); }
+.sn-item.is-active{
+  background:var(--accent-weak); color:var(--accent-700); font-weight:700;
+  box-shadow:inset 2px 0 0 var(--accent);
+}
+.sn-ico{ flex:none; width:20px; text-align:center; font-size:15px; line-height:1; }
+.sn-label{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+
+.sn-foot{ flex:none; padding:var(--s-3); border-top:1px solid var(--border); }
+.sn-foot .user-chip{ display:flex; align-items:center; gap:var(--s-3); min-width:0; }
+.user-avatar{
+  flex:none; width:30px; height:30px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--accent-weak); color:var(--accent-700);
+  font-size:12.5px; font-weight:750; letter-spacing:.02em;
+  border:1px solid var(--accent-weak-2);
+}
+.user-meta{ display:flex; flex-direction:column; min-width:0; line-height:1.25; }
+
+/* --- sbalený stav (tlačítko nebo úzké okno) --- */
+.nav-collapsed .sidenav{ width:var(--sn-w-min); }
+.nav-collapsed .sn-label,
+.nav-collapsed .brand,
+.nav-collapsed .user-meta{ display:none; }
+.nav-collapsed .brand-mini{ display:inline-flex; }
+.nav-collapsed .sn-head{ justify-content:center; padding:0; gap:var(--s-2); }
+.nav-collapsed .sn-item{ justify-content:center; padding:0; gap:0; }
+.nav-collapsed .sn-item.is-active{ box-shadow:inset 2px 0 0 var(--accent); }
+.nav-collapsed .sn-foot .user-chip{ justify-content:center; }
+.nav-collapsed .sn-foot{ padding:var(--s-3) 0; }
+
+/* =====================================================================
+   TOPBAR
+   ===================================================================== */
+.topbar{
+  position:sticky; top:0; z-index:30;
+  background:rgba(255,255,255,.86);
+  backdrop-filter:saturate(160%) blur(10px);
+  -webkit-backdrop-filter:saturate(160%) blur(10px);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 1px 0 rgba(0,0,0,.01);
+}
+.topbar-inner{
+  max-width:var(--content-max); margin:0 auto;
+  min-height:var(--topbar-h);
+  display:flex; align-items:center; gap:var(--s-4);
+  padding:var(--s-2) var(--gutter);
+  flex-wrap:wrap;
+}
+.brand{ display:flex; align-items:baseline; gap:6px; }
+.brand-mark{ font-weight:750; letter-spacing:.05em; font-size:16px; }
+.brand-sub{ color:var(--accent); font-weight:650; font-size:13px; }
+
+/* Název routy v topbaru (nahradil brand — ten je teď v sidebaru) */
+.route-title{
+  flex:none; font-size:15px; font-weight:700; letter-spacing:-.01em; color:var(--text);
+  white-space:nowrap;
+}
+.dash-controls{ display:flex; align-items:center; gap:var(--s-4); flex-wrap:wrap; }
+
+/* Kontejnery rout: přepíná je app.js přes [hidden] */
+.route-view{ display:flex; flex-direction:column; gap:var(--s-5); }
+.route-empty{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--s-2);
+  text-align:center; padding:var(--s-8) var(--s-5);
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--r-md);
+  box-shadow:var(--shadow-xs);
+}
+.route-empty .re-ico{ font-size:30px; line-height:1; opacity:.75; }
+.route-empty .re-title{ font-size:16px; font-weight:700; }
+.route-empty .re-text{ font-size:13px; color:var(--text-3); max-width:420px; }
+.route-empty .btn{ margin-top:var(--s-2); }
+
+/* Segment (Prsteny / Náušnice) */
+.seg{
+  display:inline-flex; padding:3px; gap:2px;
+  background:var(--surface-3); border:1px solid var(--border);
+  border-radius:var(--r-pill);
+}
+.seg-btn{
+  height:30px; padding:0 var(--s-4); border:0; background:transparent;
+  color:var(--text-2); font-weight:650; font-size:13px; border-radius:var(--r-pill);
+  cursor:pointer; transition:all .14s;
+}
+.seg-btn:hover{ color:var(--text); }
+.seg-btn.is-active{ background:var(--surface); color:var(--accent-700); box-shadow:var(--shadow-xs); }
+
+/* Picker období
+   ⚠️ FEEDBACK C1 — třídu `.chip` používá i tables.js pro pilulky v tabulkách (funnel, DŮVOD…)
+   a injektuje si vlastní `.chip{…}` za běhu (tedy PO tomhle souboru → při stejné specificitě
+   vyhrává on). Dokud byly zdejší chipy psané jako holé `.chip`, obě definice se mlátily:
+   z tables.js přitekl `line-height:1.5`, odsud `height:30px` → text v pilulce seděl nahoře,
+   ne na středu. Proto jsou chipy pickeru scopnuté na `.period` (specificita 0,2,0 → vyhrává
+   nad `.chip` z tables.js) a geometrie tabulkových pilulek se řeší níž v sekci CHIPS. */
+.period{ display:flex; align-items:center; gap:var(--s-2); flex-wrap:wrap; }
+.period .chips{ display:inline-flex; gap:var(--s-1); flex-wrap:wrap; }
+.period .chip{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:30px; padding:0 var(--s-3); min-width:34px;
+  border:1px solid var(--border); border-radius:var(--r-pill);
+  background:var(--surface); color:var(--text-2);
+  font-weight:600; font-size:12.5px; line-height:1; cursor:pointer;
+  transition:all .13s; text-align:center; white-space:nowrap;
+  max-width:none;   /* přebít max-width:170px z tables.js */
+}
+.period .chip:hover{ background:var(--surface-2); border-color:var(--border-strong); color:var(--text); }
+.period .chip.is-active{
+  background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:var(--shadow-xs);
+}
+.period .chip-custom{ font-weight:650; gap:5px; padding:0 var(--s-3); }
+.period .chip-custom .cc-ico{ font-size:11px; line-height:1; }
+.period .chip-custom.is-active{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.period .chip-custom[aria-expanded="true"]{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-weak); }
+
+/* =====================================================================
+   N5 — DATE PICKER POPOVER
+   ---------------------------------------------------------------------
+   Filip: „date picker není user-friendly" → předělat.
+   Vlevo rychlé volby, vpravo kalendář (2 měsíce, česky), nahoře čitelný
+   readout „Od → Do" + počet dní, dole potvrzení. Vendor flatpickr má
+   VŠECHNY rozměry natvrdo v px (kalendář 307,875 px, den 39×39 px) →
+   níž ho rozšiřujeme a přebarvujeme do našeho jazyka. Bez toho vypadá
+   jako cizí widget (a přesně to Filipovi vadilo).
+   ===================================================================== */
+.period{ position:relative; }
+.period-pop{
+  position:absolute; top:calc(100% + 10px); right:0; z-index:40;
+  max-width:calc(100vw - 24px);   /* nikdy přes okraj okna (JS clamp dopočítá left) */
+  display:flex; align-items:stretch;
+  background:var(--surface);
+  border:1px solid var(--border-strong);
+  border-radius:var(--r-lg);
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;
+  animation:pop .14s cubic-bezier(.2,.9,.3,1.1);
+}
+.period-pop[hidden]{ display:none; }
+
+/* --- rychlé volby --- */
+.pp-quick{
+  flex:none; width:172px;
+  display:flex; flex-direction:column; gap:2px;
+  padding:var(--s-4) var(--s-3);
+  background:var(--surface-2); border-right:1px solid var(--border);
+}
+.pp-quick-h{
+  font-size:10.5px; font-weight:750; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--text-3); padding:0 var(--s-2) var(--s-2);
+}
+.pp-q{
+  display:flex; flex-direction:column; gap:1px; align-items:flex-start;
+  padding:8px var(--s-3); border:1px solid transparent; border-radius:var(--r-sm);
+  background:transparent; color:var(--text); text-align:left;
+  font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.pp-q:hover{ background:var(--accent-weak); border-color:var(--accent-weak-2); color:var(--accent-700); }
+.pp-q:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--accent-weak-2); }
+.pp-q .pp-q-n{ font-size:10.5px; font-weight:500; color:var(--text-3); }
+.pp-q:hover .pp-q-n{ color:var(--accent-600); }
+
+/* --- pravá část: readout + kalendář + potvrzení --- */
+.pp-main{ display:flex; flex-direction:column; min-width:0; }
+.pp-readout{
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:var(--s-3) var(--s-4); border-bottom:1px solid var(--border);
+}
+.pp-ro{
+  display:flex; flex-direction:column; gap:1px; min-width:104px;
+  padding:5px var(--s-3);
+  background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-sm);
+}
+.pp-ro-l{ font-size:10px; font-weight:750; letter-spacing:.05em; text-transform:uppercase; color:var(--text-3); }
+.pp-ro-v{ font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--text); }
+.pp-arrow{ color:var(--text-3); font-size:13px; }
+.pp-days{
+  margin-left:auto; font-size:11.5px; font-weight:650; color:var(--accent-700);
+  background:var(--accent-weak); border:1px solid var(--accent-weak-2);
+  padding:3px 10px; border-radius:var(--r-pill); font-variant-numeric:tabular-nums;
+}
+.pp-days:empty{ display:none; }
+
+.pp-cal{ padding:var(--s-2) var(--s-3) 0; }
+.pp-anchor{ position:absolute; width:0; height:0; padding:0; border:0; opacity:0; pointer-events:none; }
+
+.pp-foot{
+  display:flex; align-items:center; gap:var(--s-2);
+  padding:var(--s-3) var(--s-4); border-top:1px solid var(--border);
+  background:var(--surface-2);
+}
+.pp-hint{ flex:1; font-size:11.5px; color:var(--text-3); }
+
+/* ---------------------------------------------------------------------
+   FLATPICKR — přebarvení + zvětšení (vendor CSS má px natvrdo)
+   Selektory jsou scopnuté na .pp-cal → nemůžou rozbít nic jiného.
+   --------------------------------------------------------------------- */
+/* ⚠️ ŠÍŘKY — dvě pasti, obě naměřené v prohlížeči, ne odhadnuté:
+   1) Vendor CSS má `.flatpickr-calendar/.flatpickr-days/.dayContainer` napevno na
+      307,875 px. Přepsat je na `auto` NESTAČÍ: `.dayContainer` je flex-wrap
+      kontejner, takže bez šířky zkolabuje na ~1 px a 35 dnů se naskládá POD SEBE
+      (naměřeno: dayContainer 1×1295 px = prázdný bílý sloupec).
+   2) ⚠️ `!important` NENÍ kosmetika. flatpickr si šířku píše INLINE z JS:
+        n = (days.offsetWidth + 1) * showMonths
+        daysContainer.style.width = n; calendarContainer.style.width = n
+      Měří se v `build()`, jenže popover je v tu chvíli `hidden` (display:none)
+      → offsetWidth = 0 → n = (0+1) × 2 = **2 px**. Inline styl přebije normální
+      pravidlo, takže kalendář zůstal 2 px široký a `overflow:hidden` na
+      `.flatpickr-days` uřízl všechny dny → uživatel viděl PRÁZDNÝ bílý obdélník.
+      `!important` ze stylesheetu inline styl přebije → šířku řídíme my.
+   Model: dayContainer = PEVNÝCH 280 px (7 × 40 px), rodiče = `max-content`
+   (2 měsíce → 560 px). Sáhneš-li na šířku dne, přepočítej i těch 280 px níž. */
+.pp-cal .flatpickr-calendar{
+  width:max-content !important; max-width:none; box-shadow:none; border:0; background:transparent;
+  font-family:var(--font); font-size:13px;
+}
+.pp-cal .flatpickr-calendar.inline{ top:0; }
+.pp-cal .flatpickr-months{ padding:0 0 var(--s-2); align-items:center; }
+.pp-cal .flatpickr-month{ height:32px; color:var(--text); }
+.pp-cal .flatpickr-current-month{
+  font-size:13.5px; font-weight:700; padding:0; height:32px; display:flex;
+  align-items:center; justify-content:center; width:100%; left:0;
+}
+.pp-cal .flatpickr-current-month .cur-month{ font-weight:700; margin:0 4px 0 0; }
+.pp-cal .flatpickr-current-month input.cur-year{ font-weight:700; padding:0; }
+.pp-cal .flatpickr-prev-month, .pp-cal .flatpickr-next-month{
+  padding:6px 8px; height:32px; border-radius:var(--r-sm); fill:var(--text-2);
+}
+.pp-cal .flatpickr-prev-month:hover, .pp-cal .flatpickr-next-month:hover{ background:var(--surface-3); }
+.pp-cal .flatpickr-prev-month:hover svg, .pp-cal .flatpickr-next-month:hover svg{ fill:var(--accent); }
+.pp-cal span.flatpickr-weekday{
+  font-size:10.5px; font-weight:750; color:var(--text-3);
+  text-transform:uppercase; letter-spacing:.03em;
+}
+.pp-cal .flatpickr-weekdaycontainer{ padding:0; }
+.pp-cal .flatpickr-days{ width:max-content !important; }   /* viz past #2 výš (inline styl z JS) */
+.pp-cal .dayContainer{ width:280px; min-width:280px; max-width:280px; padding:0; }  /* 7 × 40 px */
+/* 39×39 vendor → 40×36 s vlastní typografií; širší dny = pohodlnější terč */
+.pp-cal .flatpickr-day{
+  width:40px; max-width:40px; flex-basis:40px; height:36px; line-height:36px;
+  border-radius:var(--r-sm); font-size:12.5px; font-weight:600; color:var(--text);
+  border-color:transparent;
+}
+.pp-cal .flatpickr-day:hover{ background:var(--surface-3); border-color:var(--surface-3); }
+.pp-cal .flatpickr-day.today{ border-color:var(--accent); font-weight:750; }
+.pp-cal .flatpickr-day.inRange{
+  background:var(--accent-weak); border-color:var(--accent-weak);
+  box-shadow:-5px 0 0 var(--accent-weak), 5px 0 0 var(--accent-weak);
+  color:var(--accent-700);
+}
+.pp-cal .flatpickr-day.selected,
+.pp-cal .flatpickr-day.startRange,
+.pp-cal .flatpickr-day.endRange{
+  background:var(--accent); border-color:var(--accent); color:#fff; font-weight:750;
+  box-shadow:none;
+}
+.pp-cal .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)){ box-shadow:-10px 0 0 var(--accent); }
+.pp-cal .flatpickr-day.flatpickr-disabled,
+.pp-cal .flatpickr-day.prevMonthDay, .pp-cal .flatpickr-day.nextMonthDay{ color:var(--text-3); opacity:.45; }
+.pp-cal .flatpickr-day.flatpickr-disabled{ text-decoration:line-through; opacity:.3; }
+.pp-cal .flatpickr-months .flatpickr-month + .flatpickr-month{ border-left:1px solid var(--border); }
+
+.topbar-right{ display:flex; align-items:center; gap:var(--s-3); margin-left:auto; }
+.btn-refresh .refresh-ico{ font-size:15px; line-height:1; display:inline-block; }
+.btn-refresh.is-loading .refresh-ico{ animation:spin .8s linear infinite; }
+.refresh-label{ font-size:11.5px; color:var(--text-3); white-space:nowrap; }
+.topbar-sep{ width:1px; height:22px; background:var(--border); }
+.user-chip{ display:flex; align-items:center; gap:var(--s-2); }
+/* Uživatel bydlí v patičce sidebaru (dřív pilulka v topbaru) → prostý text
+   vedle avataru; pilulka by se v úzkém sloupci lámala. */
+.user-name{
+  font-weight:700; font-size:12.5px; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.btn-logout{
+  border:0; background:transparent; color:var(--text-3);
+  font-size:11px; cursor:pointer; text-decoration:underline; padding:0;
+  text-align:left; align-self:flex-start;
+}
+.btn-logout:hover{ color:var(--red); }
+.btn-logout:focus-visible{ outline:none; box-shadow:0 0 0 3px var(--accent-weak-2); border-radius:3px; }
+
+.period-summary{
+  max-width:var(--content-max); margin:0 auto; padding:0 var(--gutter) var(--s-2);
+  font-size:11.5px; color:var(--text-3);
+}
+
+/* =====================================================================
+   CONTENT / SEKCE / KARTY
+   ===================================================================== */
+.content{
+  flex:1; width:100%;
+  max-width:var(--content-max); margin:0 auto;
+  padding:var(--s-5) var(--gutter) var(--s-8);
+  display:flex; flex-direction:column; gap:var(--s-5);
+}
+.view{ display:flex; flex-direction:column; gap:var(--s-3); }
+.section{ display:block; }
+.section:empty{ display:none; }        /* prázdný mount (modul nenačten) se nezobrazí */
+
+/* =====================================================================
+   SBALOVACÍ SEKCE (FEEDBACK C3)
+   Markup: .sec[data-sec] > .sec-h > button.sec-head  +  .sec-body > #mount
+   Toggle + localStorage = inline skript v index.html. Default = sbaleno.
+
+   ⚠️ Sbalení JEN přes max-height:0 (+ visibility). Ne display:none, ne odstranění
+   z DOM: Tabulator i ECharts si tak i ve sbalené sekci drží skutečné rozměry
+   (overflow ovlivňuje jen vykreslení, ne layout potomků) → render do sbalené
+   sekce projde správně a po rozbalení nic nepřepočítáváme.
+   ===================================================================== */
+.sec{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-xs);
+  overflow:hidden;
+  transition:box-shadow .14s ease, border-color .14s ease;
+}
+.sec.is-open{ box-shadow:var(--shadow-sm); }
+.sec-h{ margin:0; font-size:inherit; font-weight:inherit; letter-spacing:normal; }
+
+.sec-head{
+  display:flex; align-items:center; gap:var(--s-3);
+  width:100%; padding:var(--s-4) var(--s-5);
+  border:0; background:transparent; color:var(--text);
+  text-align:left; cursor:pointer;
+  font-family:inherit; font-size:16px; font-weight:650; letter-spacing:-.01em;
+  transition:background .12s ease;
+}
+.sec-head:hover{ background:var(--surface-2); }
+.sec-head:focus-visible{ outline:none; box-shadow:inset 0 0 0 2px var(--border-focus); }
+.sec.is-open > .sec-h > .sec-head{ border-bottom:1px solid var(--border); }
+
+/* šipka — kreslená borderem (ostrá v každém zoomu). Zavřeno ▸ / otevřeno ▾ */
+.sec-chev{
+  flex:none; width:9px; height:9px; margin-left:2px; margin-right:2px;
+  border-right:2px solid var(--text-3); border-bottom:2px solid var(--text-3);
+  border-radius:1px;
+  transform:rotate(-45deg) translate(-1px,-1px);
+  transition:transform .16s ease, border-color .12s ease;
+}
+.sec.is-open > .sec-h > .sec-head .sec-chev{ transform:rotate(45deg) translate(-2px,-2px); }
+.sec-head:hover .sec-chev{ border-color:var(--text); }
+
+.sec-ico{ flex:none; font-size:15px; line-height:1; }
+.sec-title{ flex:none; }
+.sec-count{
+  flex:none;
+  font-size:12px; font-weight:650; color:var(--text-3);
+  background:var(--surface-3); border:1px solid var(--border);
+  padding:2px 9px; border-radius:var(--r-pill);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.sec-sub{
+  flex:1; min-width:0;
+  text-align:right; font-size:12px; font-weight:400; font-style:italic; color:var(--text-3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.sec-body{ overflow:hidden; }
+.sec:not(.is-open) > .sec-body{
+  max-height:0;
+  visibility:hidden;   /* ať se do sbalené sekce nedá tabovat (rozměry si drží dál) */
+}
+.sec.is-open > .sec-body{ padding:var(--s-5); }
+/* Sekce má vlastní rám i hlavičku → vnitřní chrome modulů by se dubloval. */
+.sec .ads-sec{ margin:0; }
+.sec .ads-sec-head{ display:none; }        /* nadpis + count zrcadlíme do .sec-head */
+.sec .acx-card{ border:0; border-radius:0; box-shadow:none; padding:0; background:transparent; }
+.sec .acx-title{ display:none; }           /* „Vývoj v čase" = titulek sekce */
+.sec .acx-head{ justify-content:flex-end; margin-bottom:var(--s-3); }
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-sm);
+}
+.card-pad{ padding:var(--s-5); }
+
+.section-head{
+  display:flex; align-items:center; gap:var(--s-3);
+  margin:0 0 var(--s-3);
+}
+.section-head h2{ font-size:16px; }
+.section-head .count{
+  font-size:12px; font-weight:650; color:var(--text-3);
+  background:var(--surface-3); padding:2px 9px; border-radius:var(--r-pill);
+}
+.section-head .spacer{ flex:1; }
+
+/* =====================================================================
+   HEALTH ŘÁDEK
+   ===================================================================== */
+.health{
+  display:grid;
+  grid-template-columns:minmax(230px,300px) repeat(5, 1fr);
+  gap:var(--s-3);
+}
+.health-hero{
+  grid-column:1;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  box-shadow:var(--shadow-sm);
+  padding:var(--s-5);
+  display:flex; flex-direction:column; justify-content:center; gap:2px;
+  position:relative; overflow:hidden;
+}
+.health-hero::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:5px;
+  background:var(--h-color, var(--text-3));
+}
+.health-hero .big{
+  font-size:44px; font-weight:760; line-height:1; letter-spacing:-.02em;
+  color:var(--h-color, var(--text));
+  font-variant-numeric:tabular-nums;
+}
+.health-hero .big-label{ font-size:12.5px; color:var(--text-2); margin-top:6px; font-weight:600; }
+.health-hero .big-note{ font-size:11px; color:var(--text-3); margin-top:2px; }
+
+.tile{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-md); box-shadow:var(--shadow-xs);
+  padding:var(--s-4) var(--s-4);
+  display:flex; flex-direction:column; justify-content:center; gap:3px;
+}
+.tile .tile-label{ font-size:11.5px; color:var(--text-3); font-weight:650; text-transform:uppercase; letter-spacing:.03em; }
+.tile .tile-val{ font-size:22px; font-weight:720; letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
+.tile .tile-val.pos{ color:var(--green); }
+.tile .tile-val.neg{ color:var(--red); }
+.tile .tile-sub{ font-size:11px; color:var(--text-3); }
+
+/* Health barvy hero */
+.h-green  { --h-color:var(--green); }
+.h-yellow { --h-color:var(--yellow); }
+.h-red    { --h-color:var(--red); }
+
+/* =====================================================================
+   BANNERY (HECK, anomálie)
+   ===================================================================== */
+.banner{
+  display:flex; align-items:center; gap:var(--s-4);
+  border-radius:var(--r-md);
+  padding:var(--s-4) var(--s-5);
+  border:1px solid transparent;
+}
+.banner .banner-ico{ font-size:22px; line-height:1; }
+.banner .banner-body{ flex:1; }
+.banner .banner-title{ font-weight:700; font-size:14.5px; }
+.banner .banner-text{ font-size:12.5px; color:var(--text-2); margin-top:2px; }
+
+.banner-heck{
+  background:linear-gradient(100deg, var(--accent) 0%, var(--accent-600) 100%);
+  color:#fff; border-color:var(--accent-700);
+  box-shadow:var(--shadow-md);
+}
+.banner-heck .banner-text{ color:rgba(255,255,255,.85); }
+.banner-heck .btn{ background:#fff; color:var(--accent-700); border-color:#fff; }
+.banner-heck .btn:hover{ background:#f2f3ff; }
+
+.banner-anomaly{
+  background:var(--red-bg); border-color:var(--red-bd); color:#7c2420;
+}
+.banner-anomaly .banner-title{ color:var(--red); }
+.banner-anomaly .anomaly-list{ display:flex; flex-wrap:wrap; gap:var(--s-2); margin-top:6px; }
+.banner-anomaly .anomaly-item{
+  font-size:11.5px; font-weight:600; background:#fff; border:1px solid var(--red-bd);
+  color:#8a2a25; padding:2px 8px; border-radius:var(--r-pill);
+}
+.banner-done{ background:var(--green-bg); border-color:var(--green-bd); color:#1c5e40; }
+.banner-done .banner-title{ color:var(--green); }
+
+/* =====================================================================
+   CHIPS v tabulkách (FEEDBACK C1) — DŮVOD / funnel / scale / dopočet pilulky
+   ---------------------------------------------------------------------
+   Barvy variant (.chip-funnel, .chip.layer-1…4, .chip.scale, .chip.wait,
+   .chip.dop-warn…) zůstávají tam, kde vznikají = v tables.js. Tady řešíme JEN
+   geometrii, a to jednotně pro všechny varianty, ať mají stejnou výšku.
+
+   Proč `.ads-sec .chip` (0,2,0): tables.js si injektuje `.chip{…}` (0,1,0) až za
+   běhu, takže na shodné specificitě vyhrává on. Scopnutím na .ads-sec vyhrajeme
+   geometrii, ale barvy z `.chip.layer-1` (taky 0,2,0, ale později v pořadí)
+   necháme jemu. Záměr: barvy = semafor v tables.js, tvar = design systém tady.
+
+   Výška NENÍ pevná, skládá se z padding + line-height + 1px border → text sedí
+   opticky na středu vždycky, i kdyby se změnil font-size. (Původní bug: `height:30px`
+   z chipů pickeru + `line-height:1.5` z tables.js → text nalepený nahoře.) */
+.ads-sec .chip{
+  display:inline-block;
+  min-width:0;            /* buňka je flex → bez tohohle se pilulka nezmenší pod min-content a ellipsis se nechytne */
+  max-width:100%;         /* místo pevných 170px: ellipsis až když fakt dojde místo v buňce */
+  padding:3px 9px;
+  border:1px solid transparent;   /* varianty si barvu rámečku přepíšou; drží jednotnou výšku i těm bez rámečku */
+  border-radius:var(--r-pill);
+  font-size:11px; font-weight:650; line-height:15px;  /* 3+15+3+2 = 23px u všech variant */
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  vertical-align:middle;
+  /* plný text drží title="" (nastavuje ho tables.js) + tooltip Tabulatoru na buňce */
+}
+/* Pilulky vedle sebe (kreativa: kód + funnel) ať se nelepí na sebe. */
+.ads-sec .chip + .chip{ margin-left:5px; }
+
+/* =====================================================================
+   BADGE (kill vrstvy, dopočet, scale, trend)
+   ===================================================================== */
+.badge{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700; line-height:1;
+  padding:4px 8px; border-radius:var(--r-pill);
+  border:1px solid transparent; white-space:nowrap;
+}
+.badge-l1{ background:var(--red-bg);    color:#a8322c; border-color:var(--red-bd); }
+.badge-l2{ background:var(--orange-bg); color:#a2551f; border-color:var(--orange-bd); }
+.badge-l3{ background:var(--yellow-bg); color:#8a6816; border-color:var(--yellow-bd); }
+.badge-l4{ background:#efeafc;          color:#5b45a8; border-color:#ddd2f4; }
+.badge-warn{ background:var(--yellow-bg); color:#8a6816; border-color:var(--yellow-bd); }
+.badge-info{ background:var(--info-bg); color:#245a97; border-color:var(--info-bd); }
+.badge-new{ background:var(--accent-weak); color:var(--accent-700); border-color:var(--accent-weak-2); }
+.badge-scale{ background:var(--green-bg); color:#1c6b47; border-color:var(--green-bd); }
+.badge-young{ background:var(--surface-3); color:var(--text-2); border-color:var(--border); }
+.badge-muted{ background:var(--surface-3); color:var(--text-3); border-color:var(--border); }
+
+/* Trend šipky */
+.trend{ font-weight:700; font-variant-numeric:tabular-nums; }
+.trend-up{ color:var(--red); }      /* CPS ⬆ = horší */
+.trend-down{ color:var(--green); }  /* CPS ⬇ = lepší */
+.trend-flat{ color:var(--text-3); }
+
+/* ROAS semafor pill (tabulky) */
+.roas-pill{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:52px; padding:3px 9px; border-radius:var(--r-sm);
+  font-weight:700; font-size:12.5px; font-variant-numeric:tabular-nums;
+  border:1px solid transparent;
+}
+.roas-green { background:var(--green-bg);  color:#15764a; border-color:var(--green-bd); }
+.roas-lgreen{ background:var(--lgreen-bg); color:#3f8c60; border-color:var(--lgreen-bd); }
+.roas-yellow{ background:var(--yellow-bg); color:#8a6816; border-color:var(--yellow-bd); }
+.roas-orange{ background:var(--orange-bg); color:#a2551f; border-color:var(--orange-bd); }
+.roas-red   { background:var(--red-bg);    color:#a8322c; border-color:var(--red-bd); }
+
+/* dot semafor (malý) */
+.dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+.dot.green{ background:var(--green);} .dot.lgreen{ background:var(--lgreen);}
+.dot.yellow{ background:var(--yellow);} .dot.orange{ background:var(--orange);} .dot.red{ background:var(--red);}
+
+/* % spend bar (top spenders) */
+.spendbar{ position:relative; height:8px; border-radius:var(--r-pill); background:var(--surface-3); overflow:hidden; min-width:60px; }
+.spendbar > i{ position:absolute; left:0; top:0; bottom:0; background:var(--accent); border-radius:var(--r-pill); }
+
+/* =====================================================================
+   NÁHLEDY (thumbnaily v tabulkách)
+   ---------------------------------------------------------------------
+   N3 (iterace 5): „list view = malé (nízká kvalita) stačí, ale o 30 % větší."
+   → 44 → 57 px (44 × 1,3). Zdroj je pořád MALÁ varianta (cache/{ad}.jpg,
+     240 px) — ta na 57px box bohatě stačí i na retině (240/57 ≈ 4,2×).
+     Velkou (900 px) bere jen dlaždice + hover/modal → viz ADS.thumbs v app.js.
+   ===================================================================== */
+.thumb{
+  width:57px; height:57px; border-radius:var(--r-sm);
+  object-fit:cover; background:var(--surface-3);
+  border:1px solid var(--border); cursor:pointer; flex:none;
+  transition:transform .12s, box-shadow .12s;
+}
+.thumb:hover{ transform:scale(1.04); box-shadow:var(--shadow-sm); }
+.thumb-lg{ width:73px; height:73px; }   /* 56 × 1,3 */
+
+/* N3 — náhledy v Tabulator tabulkách (třídy vlastní tables.js, geometrii držíme my).
+   Proč `.ads-sec` scope: tables.js si `.prev-img{width:38px}` injektuje <style> tagem
+   AŽ ZA BĚHU → v dokumentu je později a na shodné specificitě (0,1,0) by vyhrál on.
+   0,2,0 tenhle souboj vyhrává, aniž bychom sahali do cizího souboru.
+   38 × 1,3 = 49,4 → 50 px · 30 × 1,3 = 39 px. */
+.ads-sec .prev-img{ width:50px; height:50px; border-radius:9px; }
+.ads-sec .prev-img.sm{ width:39px; height:39px; border-radius:7px; }
+/* Řádek musí povyrůst s náhledem, jinak se obrázek ořízne o pár px.
+   (Tabulator počítá výšku řádku z obsahu — stačí, aby buňka nebrzdila.) */
+.ads-sec .tabulator .tabulator-row .tabulator-cell.c-prev{ padding-top:5px; padding-bottom:5px; }
+.creative-cell{ display:flex; align-items:center; gap:var(--s-3); }
+.creative-cell .cc-meta{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.creative-cell .cc-code{ font-weight:700; font-size:13px; font-variant-numeric:tabular-nums; }
+.creative-cell .cc-sub{ font-size:11px; color:var(--text-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px; }
+
+/* =====================================================================
+   TABULATOR OVERRIDE (light, vyladěný)
+   ===================================================================== */
+.tabulator{
+  background:transparent; border:0; font-size:13px;
+}
+.tabulator .tabulator-header{
+  background:var(--surface-2);
+  border-bottom:1px solid var(--border);
+  border-top-left-radius:var(--r-md); border-top-right-radius:var(--r-md);
+  font-weight:650;
+}
+.tabulator .tabulator-header .tabulator-col{
+  background:transparent; border-right:0;
+}
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content{ padding:9px 12px; }
+.tabulator .tabulator-header .tabulator-col-title{
+  color:var(--text-2); font-size:11.5px; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+}
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable:hover{ background:var(--surface-3); }
+.tabulator .tabulator-header .tabulator-col .tabulator-col-sorter .tabulator-arrow{ opacity:.5; }
+
+/* ---------------------------------------------------------------------
+   FEEDBACK C2/C5 — ŽÁDNÝ USEKNUTÝ NÁZEV V ZÁHLAVÍ („ROAS …", „ROAS M…").
+   Příčina byla dvojí:
+     1) sloupce mají v tables.js pevné šířky (ROAS model = 112 px), ale vendor
+        rezervuje `padding-right:25px` na řadicí šipku → na titulek zbylo ~75 px
+        a `text-overflow:ellipsis` ho uřízl.
+     2) titulek měl natvrdo `white-space:nowrap` → nemohl se zalomit.
+   Řešení: dovolíme dvouřádkový titulek a ušetříme místo na šipce. Selektory musí
+   mít vyšší specificitu než vendor (0,5,0) → scopujeme přes .ads-sec.
+   Ověřeno v prohlížeči (1440 i 2560): „ROAS model", „% rezervací", „Spáleno (ztráta)"
+   se zalomí do dvou řádků a NEjsou useknuté.
+
+   ⚠️ POZOR na pořadí: tables.js si svoje `.ads-sec …` pravidla injektuje <style> tagem
+   až za běhu → je v dokumentu POZDĚJI než tenhle soubor. Na SHODNÉ specificitě proto
+   vyhrává ON, ne my. Praktický dopad: `.tabulator-col-content{padding}` (0,5,0) si drží
+   tables.js na `9px 10px` — nemá smysl to odsud přepisovat stejným selektorem (bylo by
+   to mrtvé pravidlo) a hlavně SE TO NESMÍ: horizontálních 10 px se musí rovnat paddingu
+   buňky (`7px 10px`), jinak se titulek rozejde s hodnotou pod ním. Přebíjíme jen to,
+   co má vyšší specificitu (0,6,0 níž) nebo co tables.js neřeší.
+   --------------------------------------------------------------------- */
+.ads-sec .tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title{
+  white-space:normal;      /* místo nowrap → dlouhý název se zalomí, neusekne */
+  text-overflow:clip;
+  overflow:visible;        /* jednoslovný titulek („Trend" = 42 px ve 40px boxu) se nezalomí →
+                              bez tohohle by ho ellipsis uřízl. Takhle se dokreslí do vlastního
+                              paddingu sloupce (ověřeno: text končí 8 px před hranou sloupce)
+                              a .tabulator-col má overflow:hidden → do souseda nepřeteče. */
+  line-height:1.25;
+}
+.ads-sec .tabulator .tabulator-header .tabulator-col.tabulator-sortable .tabulator-col-title{
+  padding-right:20px;      /* vyhrazený gutter pro šipku řazení — Filip: „ať tam má zvláštní
+                              místo". 15px nestačilo, dlouhý jednoslovný titulek (REZERVACE)
+                              s overflow:visible maloval přes šipku. */
+}
+.ads-sec .tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-sorter{ right:5px; }
+/* Titulky číselných sloupců k pravé hraně, ať sedí nad hodnotami. */
+/* !important: Tabulator vnucuje `headerHozAlign:'left'` INLINE stylem na titulek, což beze
+   „!" přebije naše text-align a titulek (REZERVACE) se táhne doprava POD šipku řazení.
+   Pravé zarovnání + padding-right (gutter výš) drží text vlevo od šipky. */
+.ads-sec .tabulator .tabulator-header .tabulator-col.c-num .tabulator-col-title,
+.ads-sec .tabulator .tabulator-header .tabulator-col.c-sem .tabulator-col-title{ text-align:right !important; }
+
+.tabulator .tabulator-tableholder{ background:transparent; }
+.tabulator .tabulator-row{
+  background:var(--surface); border-bottom:1px solid var(--border);
+  transition:background .1s;
+}
+.tabulator .tabulator-row.tabulator-row-even{ background:var(--surface); }
+.tabulator .tabulator-row:hover{ background:var(--surface-2); }
+.tabulator .tabulator-row .tabulator-cell{
+  border-right:0; padding:9px 12px; color:var(--text);
+  font-variant-numeric:tabular-nums; display:flex; align-items:center;
+}
+.tabulator .tabulator-row.tabulator-selectable:hover{ cursor:pointer; }
+.tabulator-row.row-killed{ opacity:.62; }
+.tabulator-row.row-killed .tabulator-cell{ color:var(--text-3); }
+
+/* vnořené řádky (rozklik na jednotlivé ady) */
+.tabulator .tabulator-row.tabulator-tree-level-1{ background:var(--surface-2); }
+.subads{ padding:var(--s-2) var(--s-2) var(--s-2) 56px; background:var(--surface-2); }
+.subads .subad{
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:6px 10px; border-radius:var(--r-sm);
+  font-size:12px; border:1px solid var(--border); background:var(--surface); margin-bottom:6px;
+}
+.subads .subad:last-child{ margin-bottom:0; }
+.subads .subad .sa-id{ font-family:var(--mono); font-size:11px; color:var(--text-3); }
+
+.tabulator .tabulator-footer{ background:var(--surface-2); border-top:1px solid var(--border); color:var(--text-3); }
+.tabulator .tabulator-placeholder{ color:var(--text-3); }
+.tabulator .tabulator-placeholder .tabulator-placeholder-contents{ color:var(--text-3); font-weight:600; }
+
+/* =====================================================================
+   GRAFY (charts-root chrome)
+   ===================================================================== */
+.chart-toolbar{ display:flex; align-items:center; gap:var(--s-2); flex-wrap:wrap; margin-bottom:var(--s-3); }
+.chart-box{ width:100%; height:360px; }
+.chart-legend-note{ font-size:11px; color:var(--text-3); margin-top:var(--s-2); display:flex; align-items:center; gap:6px; }
+.hatch-key{ width:22px; height:10px; border-radius:3px;
+  background:repeating-linear-gradient(45deg, var(--surface-3), var(--surface-3) 3px, var(--border-strong) 3px, var(--border-strong) 6px);
+  border:1px solid var(--border); display:inline-block; }
+
+/* =====================================================================
+   MODAL
+   ===================================================================== */
+.modal-overlay{
+  position:fixed; inset:0; z-index:50;
+  background:rgba(28,25,20,.42);
+  backdrop-filter:blur(2px);
+  display:flex; align-items:center; justify-content:center;
+  padding:var(--s-5);
+  overflow-y:auto;                 /* pojistka: i extrémně vysoký modal scrolluje UVNITŘ overlaye, ne pozadí */
+  overscroll-behavior:contain;
+  animation:fade .15s ease;
+}
+/* Filip: detail reklamy byl vyšší než viewport, nescrolloval uvnitř a scrollovalo se pozadí.
+   → flex sloupec: hlavička (+ ✕) a patička fixní, TĚLO scrolluje. max-height drží okno ve
+   viewportu; `min-height:0` na tělu je NUTNÝ, jinak flex-item nescvrkne pod obsah a overflow
+   se nespustí. overscroll-behavior:contain + zámek <html> (.ads-modal-open) zabijí scroll pozadí. */
+.modal{
+  width:100%; max-width:560px;
+  max-height:calc(100vh - 2 * var(--s-5));
+  display:flex; flex-direction:column; overflow:hidden;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-lg); box-shadow:var(--shadow-lg);
+  animation:pop .16s cubic-bezier(.2,.9,.3,1.1);
+}
+.modal-sm{ max-width:440px; }
+.modal-head{
+  flex:none;
+  display:flex; align-items:center; gap:var(--s-3);
+  padding:var(--s-4) var(--s-5); border-bottom:1px solid var(--border);
+}
+.modal-head h3{ font-size:15px; flex:1; }
+.modal-close{
+  border:0; background:var(--surface-3); width:30px; height:30px; border-radius:var(--r-sm);
+  cursor:pointer; color:var(--text-2); font-size:16px; line-height:1;
+}
+.modal-close:hover{ background:var(--border); color:var(--text); }
+.modal-body{ padding:var(--s-5); flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+.modal-foot{ flex:none; display:flex; gap:var(--s-3); justify-content:flex-end; padding:var(--s-4) var(--s-5); border-top:1px solid var(--border); }
+/* zámek scrollu stránky, když je otevřený modal */
+html.ads-modal-open, html.ads-modal-open body{ overflow:hidden; }
+
+/* Preview modal */
+.preview-media{ width:100%; border-radius:var(--r-md); background:var(--surface-3); border:1px solid var(--border); display:block; }
+.preview-meta{ margin-top:var(--s-4); display:flex; flex-direction:column; gap:6px; }
+.preview-meta .pm-code{ font-weight:700; font-size:15px; }
+.preview-meta .pm-row{ font-size:12.5px; color:var(--text-2); }
+.preview-actions{ display:flex; gap:var(--s-3); flex-wrap:wrap; margin-top:var(--s-4); }
+
+/* =====================================================================
+   TOASTY
+   ===================================================================== */
+.toast-root{
+  position:fixed; right:var(--s-5); bottom:var(--s-5); z-index:70;
+  display:flex; flex-direction:column; gap:var(--s-2); align-items:flex-end;
+}
+.toast{
+  min-width:220px; max-width:380px;
+  display:flex; align-items:flex-start; gap:var(--s-3);
+  background:var(--surface); border:1px solid var(--border);
+  border-left:4px solid var(--text-3);
+  border-radius:var(--r-sm); box-shadow:var(--shadow-md);
+  padding:var(--s-3) var(--s-4); font-size:13px; color:var(--text);
+  animation:slidein .2s ease;
+}
+.toast.toast-success{ border-left-color:var(--green); }
+.toast.toast-error{ border-left-color:var(--red); }
+.toast.toast-info{ border-left-color:var(--info); }
+.toast.toast-warn{ border-left-color:var(--yellow); }
+.toast.leaving{ animation:slideout .18s ease forwards; }
+.toast .t-ico{ font-size:15px; line-height:1.3; }
+.toast .t-msg{ flex:1; }
+
+/* =====================================================================
+   SPINNER / SKELETON
+   ===================================================================== */
+.spinner{
+  width:18px; height:18px; border-radius:50%;
+  border:2.5px solid var(--accent-weak-2); border-top-color:var(--accent);
+  animation:spin .7s linear infinite; display:inline-block;
+}
+.spinner-lg{ width:30px; height:30px; border-width:3px; }
+.loading-row{ display:flex; align-items:center; gap:var(--s-3); color:var(--text-3); font-size:13px; padding:var(--s-5); justify-content:center; }
+.skel{ background:linear-gradient(90deg,var(--surface-3) 25%,#e9e7e0 37%,var(--surface-3) 63%); background-size:400% 100%; animation:shimmer 1.3s ease infinite; border-radius:var(--r-sm); }
+.skel-line{ height:12px; margin:6px 0; }
+
+/* =====================================================================
+   ANIMACE
+   ===================================================================== */
+@keyframes spin{ to{ transform:rotate(360deg);} }
+@keyframes fade{ from{ opacity:0;} to{ opacity:1;} }
+@keyframes pop{ from{ opacity:0; transform:translateY(8px) scale(.98);} to{ opacity:1; transform:none;} }
+@keyframes slidein{ from{ opacity:0; transform:translateX(16px);} to{ opacity:1; transform:none;} }
+@keyframes slideout{ to{ opacity:0; transform:translateX(16px);} }
+@keyframes shimmer{ to{ background-position:-135% 0;} }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
+
+/* =====================================================================
+   RESPONSIVE
+   ===================================================================== */
+
+/* N1: na užším okně se sidebar sbalí na ikony SÁM — menu nesmí ukusovat
+   z tabulek. Pravidla jsou 1:1 kopie .nav-collapsed (ne @extend, CSS ho nemá).
+   Ruční přepínač na téhle šířce nic nedělá — a to je záměr: pod 1180px prostě
+   místo není. */
+@media (max-width: 1180px){
+  .sidenav{ width:var(--sn-w-min); }
+  .sn-label, .sn-head .brand, .user-meta{ display:none; }
+  .brand-mini{ display:inline-flex; }
+  .sn-head{ justify-content:center; padding:0; }
+  .sn-item{ justify-content:center; padding:0; gap:0; }
+  .sn-foot{ padding:var(--s-3) 0; }
+  .sn-foot .user-chip{ justify-content:center; }
+  .sn-toggle{ display:none; }      /* sbaleno napevno → tlačítko by lhalo */
+}
+
+/* ⚠️ 1360, ne 1080 — kvůli sidebaru (N1).
+   Media query měří OKNO, ale dlaždice žijí v obsahu, který je teď o sidebar užší:
+     obsah = okno − 224 (sidebar) − 48 (gutter)
+   Původních 1080 bylo vyladěných na dobu, kdy obsah = celé okno. Po přidání menu
+   by 6 dlaždic dostalo v okně 1100 jen ~1030 px → „ROAS MODEL" a „KILL KANDIDÁTI"
+   se lámaly do dvou řádků (naměřeno v prohlížeči).
+   1360 − 224 − 48 = 1088 ≈ původní práh 1080 → chování v obsahu zůstává stejné.
+   Kontrola: okno 1440 (Filipův laptop) → obsah 1168 → dlaždice v jednom řádku. */
+@media (max-width: 1360px){
+  .health{ grid-template-columns:repeat(3,1fr); }
+  .health-hero{ grid-column:1 / -1; }
+}
+@media (max-width: 860px){
+  /* Popover 2 měsíce + rychlé volby se nevejde → app.js přepne kalendář na
+     1 měsíc (showMonths) a rychlé volby jdou nad něj. */
+  .period-pop{ flex-direction:column; }
+  .pp-quick{
+    width:auto; flex-direction:row; flex-wrap:wrap; gap:var(--s-2);
+    border-right:0; border-bottom:1px solid var(--border);
+  }
+  .pp-quick-h{ width:100%; padding-bottom:0; }
+}
+@media (max-width: 720px){
+  :root{ --gutter: var(--s-3); }   /* drží topbar, obsah i period-summary na stejné hraně */
+  .topbar-inner{ gap:var(--s-2); }
+  .topbar-right{ margin-left:auto; }
+  .content{ padding:var(--s-4) var(--gutter) var(--s-7); }
+  .health{ grid-template-columns:repeat(2,1fr); }
+  .refresh-txt{ display:none; }
+  .sec-head{ padding:var(--s-3) var(--s-4); font-size:15px; }
+  .sec.is-open > .sec-body{ padding:var(--s-3); }
+  .sec-sub{ display:none; }        /* na úzkém displeji nechat prostor titulku + počtu */
+  .route-title{ font-size:14px; }
+  .dash-controls{ order:3; width:100%; gap:var(--s-2); }
+  /* Popover na mobilu ukotvený k levé hraně, ať nepřeteče z okna */
+  .period-pop{ right:auto; left:0; max-width:calc(100vw - 2 * var(--gutter)); }
+}
+
+/* Legenda kill pravidel — odkaz nad tabulkou v sekcích „Na kill" (Filip 14. 8. 2026). */
+.kill-legend-link{display:inline-block;margin:2px 0 8px 2px;padding:4px 10px;font:inherit;
+  font-size:12px;color:#8a7f6a;background:#faf8f3;border:1px solid #eee6d8;border-radius:8px;cursor:pointer}
+.kill-legend-link:hover{color:#4a4438;border-color:#d6cdbd}
+
+/* Rozpad rozpočtu (test / ověřené v EXP / SCALE) — Filip 14. 8. 2026 */
+.bs-wrap{background:#fff;border:1px solid #eee6d8;border-radius:14px;padding:12px 14px;margin:10px 0 14px}
+.bs-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.bs-title{font-weight:600;color:#3c372e}
+.bs-verdict{font-size:12.5px;font-weight:700;margin-left:auto;padding:3px 10px;border-radius:999px}
+.bs-bar{display:flex;height:30px;border-radius:9px;overflow:hidden;background:#f3efe6;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.bs-seg{height:100%;transition:width .3s;box-shadow:inset -1px 0 0 rgba(255,255,255,.55)}
+.bs-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:13px;color:#4a443b}
+.bs-li{display:inline-flex;align-items:center;gap:6px}
+.bs-li i{width:12px;height:12px;border-radius:3px;display:inline-block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.bs-kc{color:#958d7d}
+.bs-note{margin-top:8px;font-size:11.5px;color:#8a8172;line-height:1.45}
+@media(max-width:640px){.bs-verdict{margin-left:0;width:100%}}

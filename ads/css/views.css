@@ -1,0 +1,481 @@
+/* =====================================================================
+   NK Ads Dashboard — views.css
+   Styl VIEW ENGINE (views.js): řádek hlavních záložek, ⋮ menu, dialogy,
+   emoji picker, tooltip poznámky, stránkování.
+
+   Vlastník: views.js. Nikdo jiný sem nesahá.
+   Do 16. 7. tenhle CSS žil jako `<style id="ads-views-css">` uvnitř views.js;
+   vytažením do souboru se dá číst i cachovat, a hlavně přestal růst uvnitř JS.
+   views.js si <link> umí doplnit sám (ensureStylesheet), takže když se v
+   index.html na tag zapomene, vzhled se nerozsype.
+
+   ⚠️ Poučení z minulých iterací (C1 „chipy odporné", I1 „šipky šeredné"):
+   element BEZ CSS = defaultní systémové tlačítko se šedým 3D rámečkem =
+   „Windows 2000". Každá třída, kterou views.js vypisuje, MUSÍ mít pravidlo.
+
+   Barvy: bereme proměnné z design systému (styles.css) s fallbackem na
+   hodnoty, které tu byly dřív — kdyby se views.js načetl bez shellu
+   (mock/standalone), pořád to vypadá jako nástroj, ne jako formulář z roku 2000.
+   ===================================================================== */
+
+.ads-viewbar {
+  --v-surface: var(--surface, #fff);
+  --v-cream: var(--surface-2, #faf9f6);
+  --v-cream2: var(--surface-3, #f2f1ec);
+  --v-line: var(--border, #e7e4dc);
+  --v-line2: var(--border-strong, #d7d3c8);
+  --v-tx: var(--text, #2c2b28);
+  --v-tx2: var(--text-2, #6b675f);
+  --v-mut: var(--text-3, #8d897f);
+  --v-focus: #c9a9b0;
+  --v-focus-ring: rgba(168, 106, 120, .16);
+
+  display: block;
+  margin: 0 0 14px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ------------------------------------------------------------------ *
+ *  T1 — RAIL: hlavní views jako záložky v prohlížeči
+ * ------------------------------------------------------------------ *
+ * Filip (2×): „jak jsou ty záložky winners na kill a tak, ty udělej nějak
+ * hranatý, aby to bylo na první dobrou odlišitelný líp od těch pod tím" +
+ * „udělej jakože hranatý záložky se zaobleným rohem a udělej je trošku větší
+ * ještě, ať to je fakt na první pohled viditelný, že to je to hlavní."
+ *
+ * JAK to funguje (proč to není jen „border-radius navrch"):
+ *  • Rail má linku NA SPODNÍ HRANĚ svého content-boxu (::after, ne border) —
+ *    border-box by ležel POD obsahem a záložka by ho nemohla přebít.
+ *  • Aktivní záložka je vysoká přesně jako rail a má bílý spodní border →
+ *    tou 1px linkou linku railu PŘEKRYJE = splyne s bílým obsahem pod sebou.
+ *  • Neaktivní jsou nižší a krémové → čtou se jako „vzadu".
+ *  • ŽÁDNÉ záporné marginy: .vb-tabs je scroll kontejner (overflow-x), který by
+ *    je uřízl a ještě přidal svislý scrollbar.
+ */
+.ads-viewbar .vb-rail {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  min-height: 42px;
+}
+
+.ads-viewbar .vb-rail::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--v-line);
+  z-index: 0;
+}
+
+.ads-viewbar .vb-tabs {
+  position: relative;
+  z-index: 1;                 /* stacking context nad linkou railu */
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Záložky se NEZALAMUJÍ (druhá řádka by linku railu minula a iluze „splývá
+     s obsahem" by padla). Při úzkém okně se rail vodorovně scrolluje — přesně
+     jako panely v prohlížeči. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ads-viewbar .vb-tabs::-webkit-scrollbar { height: 0; width: 0; }
+
+.ads-viewbar .vb-right {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  padding-bottom: 7px;
+}
+
+/* --- Záložka ------------------------------------------------------- */
+.ads-viewbar .vtab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 14px;
+  margin: 0;
+  background: var(--v-cream2);
+  color: var(--v-tx2);
+  border: 1px solid var(--v-line);
+  /* „hranatý se zaobleným rohem" — nahoře oblé, dole ostré (sedí na lince) */
+  border-radius: 11px 11px 0 0;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -.005em;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s, color .12s, height .12s;
+}
+
+.ads-viewbar .vtab:hover {
+  background: var(--v-cream);
+  color: var(--v-tx);
+  border-color: var(--v-line2);
+}
+
+.ads-viewbar .vtab:focus-visible {
+  outline: none;
+  border-color: var(--v-focus);
+  box-shadow: 0 0 0 3px var(--v-focus-ring);
+}
+
+/* Aktivní: vyšší, bílá, tučnější, s tmavou čepičkou nahoře; spodní bílý border
+   přebíjí linku railu → záložka „ústí" do obsahu pod sebou. */
+.ads-viewbar .vtab.is-on {
+  height: 42px;
+  padding: 0 16px;
+  background: var(--v-surface);
+  color: var(--v-tx);
+  border-color: var(--v-line);
+  border-bottom-color: var(--v-surface);
+  font-size: 14.5px;
+  font-weight: 750;
+  box-shadow: 0 -2px 6px rgba(30, 28, 24, .045);
+}
+.ads-viewbar .vtab.is-on:hover { background: var(--v-surface); border-color: var(--v-line); border-bottom-color: var(--v-surface); }
+
+.ads-viewbar .vtab.is-on::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 3px;
+  background: var(--v-tx);
+  border-radius: 10px 10px 0 0;
+}
+
+.ads-viewbar .vtab .vt-i { font-size: 14px; line-height: 1; }
+.ads-viewbar .vtab.is-on .vt-i { font-size: 15px; }
+
+/* Poznámka (T4) — název dostane jemnou tečkovanou linku, ať je vidět,
+   že se tam dá najet. Bez ní by Filip nevěděl, že tam něco je. */
+.ads-viewbar .vtab .vt-t { line-height: 1; }
+.ads-viewbar .vtab.has-note .vt-t {
+  border-bottom: 1px dotted var(--v-mut);
+  padding-bottom: 1px;
+  cursor: help;
+}
+.ads-viewbar .vtab.is-on.has-note .vt-t { border-bottom-color: var(--v-line2); }
+
+/* Počty v názvech (KONSOLIDACE bod 1 — „bez toho do toho nejdeme") */
+.ads-viewbar .vtab .vt-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 19px;
+  padding: 0 6px;
+  background: var(--v-surface);
+  color: var(--v-mut);
+  border: 1px solid var(--v-line);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ads-viewbar .vtab.is-on .vt-n {
+  background: var(--v-tx);
+  border-color: var(--v-tx);
+  color: #fff;
+  height: 20px;
+  font-size: 11.5px;
+}
+.ads-viewbar .vtab .vt-n.vt-wait { letter-spacing: 1px; color: #b8b3a8; }
+.ads-viewbar .vtab.is-on .vt-n.vt-wait { color: rgba(255, 255, 255, .7); }
+
+.ads-viewbar .vtab .vt-m { font-size: 10px; color: var(--v-mut); }
+.ads-viewbar .vtab.is-on .vt-m { color: var(--v-mut); }
+
+.ads-viewbar .vtab .vt-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 24px;
+  margin: 0 -7px 0 1px;
+  border-radius: 7px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--v-mut);
+  cursor: pointer;
+  line-height: 1;
+}
+.ads-viewbar .vtab .vt-menu:hover { background: var(--v-cream2); color: var(--v-tx); }
+
+/* „+ Nové view" — vědomě NENÍ záložka (ghost, dashed), ale výškou sladěná s neaktivními
+   záložkami (36px), ať netrčí zmenšená. Filip (P1-H): 28px vypadalo utopené vedle 36px. */
+.ads-viewbar .vtab.vt-new {
+  height: 33px;
+  padding: 0 12px;
+  background: transparent;
+  border: 1px dashed var(--v-line2);
+  border-radius: 8px;
+  color: var(--v-mut);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ads-viewbar .vtab.vt-new:hover {
+  background: var(--v-cream);
+  color: var(--v-tx);
+  border-color: var(--v-focus);
+  border-style: solid;
+}
+
+/* --- T2: drag & drop pořadí ---------------------------------------- */
+.ads-viewbar .vtab[draggable="true"] { -webkit-user-select: none; user-select: none; }
+.ads-viewbar .vtab.is-drag {
+  opacity: .45;
+  /* Chrome bere „drag image" ze snímku elementu → grab kurzor + průhlednost
+     dává jasnou zpětnou vazbu, co se zrovna táhne. */
+  cursor: grabbing;
+}
+.ads-viewbar .vb-tabs.is-dragging .vtab { transition: none; }
+.ads-viewbar .vb-tabs.is-dragging .vtab:not(.is-drag):hover { background: var(--v-cream2); }
+
+/* --- Pravá strana railu -------------------------------------------- */
+.ads-viewbar .vb-ps {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--v-mut);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ads-viewbar .vb-sel {
+  height: 28px;
+  padding: 0 26px 0 9px;
+  background: var(--v-surface);
+  color: var(--v-tx);
+  border: 1px solid var(--v-line);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--v-mut) 50%),
+                    linear-gradient(135deg, var(--v-mut) 50%, transparent 50%);
+  background-position: calc(100% - 14px) 12px, calc(100% - 10px) 12px;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+  transition: border-color .12s, background-color .12s;
+}
+.ads-viewbar .vb-sel:hover { border-color: var(--v-line2); background-color: var(--v-cream); }
+.ads-viewbar .vb-sel:focus-visible { outline: none; border-color: var(--v-focus); box-shadow: 0 0 0 3px var(--v-focus-ring); }
+
+.ads-viewbar .vb-dirty {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #b5651d;
+  white-space: nowrap;
+  cursor: help;
+}
+.ads-viewbar .vb-btn {
+  height: 28px;
+  padding: 0 11px;
+  background: var(--v-surface);
+  color: var(--v-tx);
+  border: 1px solid var(--v-line2);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s;
+}
+.ads-viewbar .vb-btn:hover { background: var(--v-cream2); border-color: var(--v-focus); }
+.ads-viewbar .vb-btn:focus-visible { outline: none; border-color: var(--v-focus); box-shadow: 0 0 0 3px var(--v-focus-ring); }
+.ads-viewbar .vb-btn:disabled { opacity: .6; cursor: progress; }
+.ads-viewbar .vb-save { background: var(--v-tx); border-color: var(--v-tx); color: #fff; }
+.ads-viewbar .vb-save:hover { background: #1f1e1c; border-color: #1f1e1c; }
+
+/* ------------------------------------------------------------------ *
+ *  ⋮ menu aktivního view
+ * ------------------------------------------------------------------ */
+.vmenu {
+  position: fixed;
+  z-index: 10002;
+  min-width: 236px;
+  padding: 5px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #eceae3);
+  border-radius: 11px;
+  box-shadow: 0 12px 34px rgba(30, 25, 15, .2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.vmenu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--text, #2c2b28);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.vmenu button:hover { background: var(--surface-2, #faf8f4); }
+.vmenu .vm-sep { height: 1px; margin: 3px 5px; background: var(--border, #eceae3); }
+
+/* ------------------------------------------------------------------ *
+ *  T4 — tooltip s poznámkou view
+ * ------------------------------------------------------------------ *
+ * Vlastní bublina, ne nativní `title`: nativní se zobrazí až po ~1,5 s,
+ * nejde stylovat a u víceřádkové poznámky vypadá jako chybová hláška.
+ */
+.vtip {
+  position: fixed;
+  z-index: 10003;
+  max-width: 320px;
+  padding: 9px 11px;
+  background: #2c2b28;
+  color: #fff;
+  border-radius: 9px;
+  box-shadow: 0 10px 28px rgba(30, 25, 15, .26);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+.vtip.is-on { opacity: 1; transform: translateY(0); }
+.vtip .vtip-note { font-weight: 600; white-space: pre-wrap; word-break: break-word; }
+.vtip .vtip-sub { margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255, 255, 255, .16); color: rgba(255, 255, 255, .72); font-size: 11px; }
+.vtip .vtip-sub:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* ------------------------------------------------------------------ *
+ *  Dialogy (staví na .ads-modal z tables.js — tady jen doplňky)
+ * ------------------------------------------------------------------ */
+.vd-modal { max-width: 720px; }   /* Filip: ~30 % širší (a tím i nižší — víc se vejde vedle sebe) */
+.vd-fn-full { display: block; width: 100%; }
+.vd-fn-full .vd-fn-box { max-height: 120px; }
+.vd-p { margin: 6px 0 14px; font-size: 12.5px; line-height: 1.55; color: var(--text-2, #6b675f); }
+.vd-l { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-2, #6b675f); margin: 0 0 11px; text-transform: none; }
+.vd-in {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border, #e6e3db);
+  border-radius: 9px;
+  background: var(--surface, #fff);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text, #2c2b28);
+}
+textarea.vd-in { height: auto; min-height: 62px; padding: 8px 10px; line-height: 1.5; resize: vertical; }
+select.vd-in {
+  height: 36px;
+  padding: 0 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-3, #8d897f) 50%),
+                    linear-gradient(135deg, var(--text-3, #8d897f) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 15px, calc(100% - 10px) 15px;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.vd-in:focus { outline: none; border-color: #c9a9b0; box-shadow: 0 0 0 3px rgba(168, 106, 120, .14); }
+.vd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.vd-chk { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; font-weight: 600; color: var(--text, #2c2b28); font-size: 12.5px; }
+.vd-chk input { width: 15px; height: 15px; margin: 0; accent-color: #a86a78; cursor: pointer; }
+.vd-chk b { font-weight: 750; }
+.vd-hint { flex: 1 1 100%; font-size: 11px; font-weight: 400; color: var(--text-3, #a8a49a); line-height: 1.45; }
+.vd-primary {
+  background: var(--text, #2c2b28);
+  color: #fff;
+  border: 1px solid var(--text, #2c2b28);
+  border-radius: 9px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.vd-primary:hover { background: #1f1e1c; }
+
+/* ------------------------------------------------------------------ *
+ *  T3 — ikona záložky (jen vlastní vstup + náhled, bez gridu předvoleb)
+ * ------------------------------------------------------------------ */
+.vde-head { display: flex; align-items: center; gap: 9px; }
+.vde-now {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  background: var(--surface-2, #faf9f6);
+  border: 1px solid var(--border, #e6e3db);
+  border-radius: 10px;
+  font-size: 20px;
+  line-height: 1;
+}
+.vde-now.is-empty::after { content: '—'; font-size: 14px; color: var(--text-3, #a8a49a); }
+.vde-custom { flex: 1 1 auto; margin-top: 0; height: 40px; font-size: 15px; }
+
+@media (max-width: 640px) {
+  .vd-grid { grid-template-columns: 1fr; }
+  .ads-viewbar .vb-rail { flex-wrap: wrap; }
+  .ads-viewbar .vb-right { padding-bottom: 0; margin-top: 8px; }
+}
+
+/* ── T6 · funnel = multiple select ─────────────────────────────────────
+ * Filip chtěl „zaškrtat víc funnelů". <select multiple> by v dialogu vypadal
+ * jako 4řádkové okénko, kde není vidět výběr a musí se Ctrl+klikat → checkboxy.
+ * max-height + scroll: funnelů je dnes 8, ale přibývají — dialog nesmí přerůst obrazovku. */
+.vd-fn { margin-bottom: 11px; }
+.vd-fn-h { display: block; margin: 0 0 6px; }
+.vd-fn-h em { font-weight: 500; font-style: normal; color: var(--text-3, #9a948a); font-size: 10.5px; }
+.vd-fn-box {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  max-height: 132px; overflow-y: auto;
+  padding: 8px; border: 1px solid var(--line, #e6e1d8); border-radius: 9px;
+  background: var(--bg-2, #fbf9f5);
+}
+.vd-fn-i {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 9px; border: 1px solid var(--line, #e6e1d8); border-radius: 999px;
+  background: #fff; cursor: pointer; user-select: none;
+  font-size: 12px; font-weight: 600; color: var(--text-2, #6b675f);
+  transition: background .12s, border-color .12s, color .12s;
+}
+.vd-fn-i:hover { border-color: #c9a9b0; }
+.vd-fn-i.is-on { background: #f7eef0; border-color: #c9a9b0; color: #8a5a66; }
+.vd-fn-i input { margin: 0; accent-color: #a86a78; cursor: pointer; }

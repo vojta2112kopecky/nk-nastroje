@@ -1,0 +1,411 @@
+/* =====================================================================
+ * NK Ads Dashboard — newest.css
+ * Styly sekce „🆕 Nejnovější reklamy" (dlaždice, seznamová pásma, detail)
+ * + souhrn slepé skvrny u náušnic.
+ *
+ * PROČ VLASTNÍ SOUBOR: do 16. 7. tenhle CSS žil jako template literal uvnitř
+ * newest.js (`injectStyles()`). Mělo to dvě reálné bolesti:
+ *   1) žádné zpětné apostrofy v komentářích — jeden ukončil řetězec a shodil sekci,
+ *   2) prohlížeč styl nekešoval a nešel v devtools normálně editovat.
+ * newest.js si soubor umí sám nalinkovat, kdyby ho <link> v index.html neměl
+ * (viz `ensureStyles()`), takže sekce nikdy neskončí bez stylů.
+ *
+ * Barvy/rádiusy JEN přes proměnné z styles.css (krém + zlatá). Žádné natvrdo
+ * zadané hexy kromě průhledných překryvů nad fotkou, kde musí být kontrast
+ * garantovaný bez ohledu na téma.
+ * ===================================================================== */
+
+.newest-sec .nlead{margin:0 2px 14px;font-size:12.5px;color:var(--text-2);line-height:1.5}
+.newest-sec .nempty{padding:16px;color:var(--text-3);font-size:13px;background:var(--surface-2);
+  border:1px dashed var(--border);border-radius:var(--r-md);margin-bottom:12px}
+
+/* --- skupina (pásmo) --- */
+.ngrp{margin:0 0 18px}
+.ngrp-h{display:flex;align-items:baseline;gap:8px;margin:0 2px 8px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ngrp-ico{font-size:14px}
+.ngrp-t{font-size:14px;font-weight:700;letter-spacing:-.01em}
+.ngrp-n{font-size:11.5px;font-weight:700;color:var(--text-inv);background:var(--text-3);
+  border-radius:var(--r-pill);padding:1px 7px;min-width:18px;text-align:center}
+.ngrp-s{font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums;font-weight:600}
+.ngrp-sub{font-size:11.5px;color:var(--text-3);font-style:italic;flex:1 1 220px;min-width:0}
+.ngrp-star .ngrp-n{background:var(--green)}
+.ngrp-pot  .ngrp-n{background:var(--lgreen)}
+.ngrp-avg  .ngrp-n{background:var(--text-3)}
+.ngrp-bad  .ngrp-n{background:var(--red)}
+.ngrp-wait .ngrp-n{background:var(--info)}
+
+/* --- mřížka dlaždic --- */
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+
+.ntile{display:flex;flex-direction:column;text-align:left;padding:0;cursor:pointer;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+  box-shadow:var(--shadow-xs);overflow:hidden;font:inherit;color:inherit;
+  transition:box-shadow .14s ease,transform .14s ease,border-color .14s ease}
+.ntile:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--border-strong)}
+.ntile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Náhled má PEVNÝ čtverec, ať dlaždice v řádku lícují.
+   ⚠️ aspect-ratio SAMO NESTAČÍ (ověřeno naostro): obrázek v normálním toku s
+   height:100% neumí rozřešit procento vůči aspect-derived výšce → spadne na auto,
+   vykreslí se v přirozeném poměru (192×240 → 226 px) a min-height:auto nechá box
+   NARŮST přes aspect-ratio. Naměřeno: media 181×226 u portrétů vs 181×181 u
+   čtvercových 64×64 náhledů → dlaždice v řádku nelícovaly.
+   Řešení: obrázek ven z toku (position:absolute) → box si drží 1:1 vždy. */
+.nt-media{position:relative;display:block;aspect-ratio:1/1;background:var(--surface-3);overflow:hidden}
+.nt-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.nt-img.is-off{background:repeating-linear-gradient(45deg,var(--surface-3),var(--surface-3) 6px,var(--surface-2) 6px,var(--surface-2) 12px)}
+.nt-age{position:absolute;top:6px;left:6px;font-size:10.5px;font-weight:700;
+  background:rgba(35,38,46,.72);color:#fff;border-radius:var(--r-pill);padding:1px 6px;
+  font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+/* --- K6: video vs statika — play znak vlevo dole -------------------------------
+   Filip: „vlevo dole malej jakoby znáček play bílej s černým stínem, aby na první
+   dobrou bylo jasný, co je video a co je statika."
+   Bílý trojúhelník + černý drop-shadow → čitelný i na bílé i na tmavé fotce.
+   Statika NEMÁ žádnou ikonku (absence = statika); když typ NEZNÁME, nekreslí se
+   taky nic — radši nic než lež. Overlay je `pointer-events:none`, ať neukusuje
+   kliky dlaždici (celá dlaždice je jedno <button>). */
+.nt-play{position:absolute;left:6px;bottom:6px;width:22px;height:22px;display:block;
+  pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.85)) drop-shadow(0 0 1px rgba(0,0,0,.6))}
+.nt-play svg{width:100%;height:100%;display:block}
+.nt-play .npl-tri{fill:#fff}
+
+/* --- K4/T9: stav „běží / vypnuto" na dlaždici ---------------------------------
+   Filip: „NE emoji" → SVG tečka (běží) / dvě čárky pauzy (vypnuto).
+   Sedí vpravo nahoře na fotce, naproti stáří vlevo — stejný tmavý pill, ať to na
+   libovolném náhledu drží kontrast. */
+.nt-run{position:absolute;top:6px;right:6px;display:inline-flex;align-items:center;gap:4px;
+  background:rgba(35,38,46,.72);color:#fff;border-radius:var(--r-pill);padding:2px 6px 2px 5px;
+  font-size:9.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+.nt-run svg{width:8px;height:8px;display:block;flex:0 0 auto}
+.nt-run.is-on  svg{fill:var(--green)}
+.nt-run.is-off svg{fill:#d6d3cc}
+.nt-run.is-off{color:#e8e6e1}
+
+.nt-body{display:flex;flex-direction:column;gap:6px;padding:8px 9px 9px}
+.nt-top{display:flex;align-items:center;gap:5px;min-width:0}
+.nt-code{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:-.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nt-fn{font-size:9.5px;font-weight:600;color:var(--text-2);background:var(--surface-3);
+  border-radius:var(--r-pill);padding:1px 5px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:78px;flex:0 1 auto}
+.nt-fn.is-derived{border:1px dashed var(--border-strong);background:transparent;font-style:italic}
+
+.nt-nums{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.nt-roas{font-size:17px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.nt-roas.sem-green{color:var(--green)} .nt-roas.sem-lgreen{color:var(--lgreen)}
+.nt-roas.sem-yellow{color:var(--yellow)} .nt-roas.sem-orange{color:var(--orange)}
+.nt-roas.sem-red{color:var(--red)}
+
+/* --- K2: CPL / CPA / spend na dlaždici ----------------------------------------
+   Filip: „ty tam píšeš 0 rezervací a nevidím tam kolik je lídů. V těch kartách by
+   bylo třeba CPL tolik, tolik v závorce (jeden lead). CPA tolik, tolik Kč
+   v závorce (jeden). A pod tím by byl spend."
+   → tvar 1:1: dva řádky ceny (label · hodnota · počet v závorce) a POD NIMI spend.
+   Grid se třemi sloupci drží hodnoty CPL a CPA pod sebou zarovnané — dvě čísla
+   v korunách se jinak od sebe opticky nedají odlišit (CPA bývá 10–50× CPL). */
+.nt-costs{display:grid;grid-template-columns:auto 1fr auto;gap:2px 6px;align-items:baseline}
+/* ⚠️ ŽÁDNÝ obalový .nt-cost s display:contents — element bez boxu NEUKÁŽE `title`
+   (tooltip potřebuje box). Proto jdou všechny tři buňky do gridu přímo a `title`
+   nese každá zvlášť; jinak by se Filip na vysvětlení CPL/CPA nedohoveroval. */
+.nt-costs > *{cursor:help}
+.nt-cl{font-size:9px;font-weight:700;color:var(--text-3);letter-spacing:.04em;
+  text-transform:uppercase;font-style:normal}
+.nt-cv{font-size:11.5px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.nt-cn{font-size:10px;font-weight:600;color:var(--text-3);font-variant-numeric:tabular-nums;
+  white-space:nowrap;text-align:right}
+/* Když počet chybí (0 leadů / 0 rezervací), číslo NEZMIZÍ — právě ta nula je to,
+   co chtěl Filip vidět. Jen se ztlumí, ať netahá oko víc než cena. */
+.nt-cn.is-zero{color:var(--text-3);opacity:.72}
+
+.nt-foot{display:flex;align-items:baseline;justify-content:space-between;gap:6px;
+  font-size:11px;color:var(--text-2);font-variant-numeric:tabular-nums;
+  border-top:1px solid var(--border);padding-top:6px}
+.nt-fl{font-size:9px;font-weight:700;color:var(--text-3);letter-spacing:.04em;text-transform:uppercase}
+.nt-spend{font-weight:800;font-size:12.5px;color:var(--text);letter-spacing:-.01em}
+
+/* --- kroužek zralosti (A3): <25 č · 25-50 o · 50-75 ž · >75 z --- */
+.nz-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;flex:0 0 auto;cursor:help}
+.nz-ring svg{width:100%;height:100%;display:block}
+.nz-trk{fill:none;stroke:var(--surface-3);stroke-width:4}
+.nz-val{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dasharray .3s ease}
+.nz-num{position:absolute;font-size:9.5px;font-weight:800;font-variant-numeric:tabular-nums;
+  letter-spacing:-.03em}
+.nz-red    .nz-val{stroke:var(--red)}    .nz-red    .nz-num{color:var(--red)}
+.nz-orange .nz-val{stroke:var(--orange)} .nz-orange .nz-num{color:var(--orange)}
+.nz-yellow .nz-val{stroke:var(--yellow)} .nz-yellow .nz-num{color:var(--yellow)}
+.nz-green  .nz-val{stroke:var(--green)}  .nz-green  .nz-num{color:var(--green)}
+.nz-na     .nz-val{stroke:transparent}   .nz-na     .nz-num{color:var(--text-3)}
+.nz-sm{width:26px;height:26px}
+.nz-sm .nz-num{font-size:8.5px}
+.nz-lg{width:56px;height:56px;flex:0 0 auto}
+.nz-lg .nz-num{font-size:15px}
+
+/* --- sbalené pásmo (hlavička) --- */
+.nstrip{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface-2);
+  margin:0 0 8px;overflow:hidden}
+.nstrip-h{display:flex;align-items:center;gap:8px;width:100%;padding:9px 11px;cursor:pointer;
+  background:none;border:0;font:inherit;color:inherit;text-align:left;flex-wrap:wrap}
+.nstrip-h:hover{background:var(--surface-3)}
+.nstrip-h:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.nstrip-chev{font-size:10px;color:var(--text-3);transition:transform .15s ease;display:inline-block}
+.nstrip.is-open .nstrip-chev{transform:rotate(90deg)}
+.nstrip-t{font-size:13px;font-weight:700}
+.nstrip-n{font-size:11.5px;font-weight:700;color:var(--text-2);background:var(--surface-3);
+  border-radius:var(--r-pill);padding:1px 7px}
+.nstrip-s{font-size:12px;font-weight:700;color:var(--text-2);font-variant-numeric:tabular-nums}
+.nstrip-sub{font-size:11.5px;color:var(--text-3);font-style:italic;flex:1 1 200px;min-width:0}
+/* Rozbalení pásma = TVRDÝ display toggle, ŽÁDNÁ max-height animace.
+   PROČ (ověřeno naostro): sekce „Nejnovější" je defaultně SBALENÁ (.sec-body má
+   max-height:0 + visibility:hidden), takže se pásmo vždycky vyrábí uvnitř neviditelného
+   podstromu. Transition max-height z 0 na 640px, nastartovaný v takovém stavu, zůstane
+   zaseknutý na 0px — computed max-height držel 0px i po kliknutí, obsah (64 px) se
+   nezobrazil, a vypnutí transition ho okamžitě vrátilo na 640px = důkaz příčiny.
+   Filipa by to trefilo při KAŽDÉM načtení, tak radši žádná animace než zaseknuté pásmo. */
+.nstrip-b{display:none}
+.nstrip.is-open .nstrip-b{display:block;max-height:520px;overflow:auto}
+
+/* --- K3: pásmo = PLNÝ SEZNAM, ne jen názvy ------------------------------------
+   Filip: „chci přesně vidět, který to byly, a ne jenom ty názvy, takže aby tam byl
+   celý ten řádek a možnost se ji rozkliknout a tak dále jako u těch ostatních."
+   → řádek nese to samé, co dlaždice (stav, náhled, kód, funnel, ROAS, zralost,
+   spend, leady, rezervace, CPL, CPA) a je klikací → stejný detail jako dlaždice.
+
+   Grid s PEVNÝMI sloupci (ne tabulka): čísla musí lícovat pod sebou, jinak se to
+   nedá skenovat. Když se to nevejde, scrolluje VNITŘEK pásma vodorovně —
+   stránka jako celek nikdy (min-width na řádku + overflow-x na wrapu). */
+.nlist{overflow-x:auto}
+.nlist-in{min-width:760px}
+.nlist-hd,.nrow{display:grid;
+  grid-template-columns:26px 34px minmax(112px,1.4fr) minmax(64px,.9fr) 58px 40px 76px 54px 52px 70px 78px;
+  gap:8px;align-items:center;padding:0 11px}
+.nlist-hd{height:26px;font-size:9px;font-weight:700;color:var(--text-3);letter-spacing:.05em;
+  text-transform:uppercase;background:var(--surface-3);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:1}
+.nlist-hd span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nrow{width:100%;height:44px;background:none;border:0;border-bottom:1px solid var(--border);
+  font:inherit;color:inherit;text-align:left;cursor:pointer;box-sizing:border-box}
+.nrow:last-child{border-bottom:0}
+.nrow:hover{background:var(--surface-3)}
+.nrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.nr-th{width:34px;height:34px;border-radius:var(--r-xs);object-fit:cover;display:block;
+  background:var(--surface-3)}
+.nr-th.is-off{background:repeating-linear-gradient(45deg,var(--surface-3),var(--surface-3) 4px,var(--surface-2) 4px,var(--surface-2) 8px)}
+.nr-c{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:-.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nr-fn{font-size:10px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nr-fn.is-derived{font-style:italic;color:var(--text-3)}
+.nr-roas{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.nr-roas.sem-green{color:var(--green)} .nr-roas.sem-lgreen{color:var(--lgreen)}
+.nr-roas.sem-yellow{color:var(--yellow)} .nr-roas.sem-orange{color:var(--orange)}
+.nr-roas.sem-red{color:var(--red)}
+.nr-n{font-size:11.5px;font-variant-numeric:tabular-nums;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nr-n.is-spend{font-weight:700}
+.nr-n.is-dim{color:var(--text-3)}
+/* Stavová tečka v seznamu — stejná ikonka jako na dlaždici, jen bez pillu
+   (na bílém řádku ho nepotřebuje) a bez popisku (šířka 26 px). */
+.nr-run{display:inline-flex;align-items:center;justify-content:center;width:100%;cursor:help}
+.nr-run svg{width:9px;height:9px;display:block}
+.nr-run.is-on  svg{fill:var(--green)}
+.nr-run.is-off svg{fill:var(--text-3);opacity:.55}
+.nr-thw{position:relative;width:34px;height:34px}
+/* Play znak i v seznamu — menší, ale pořád bílý s černým stínem (K6). */
+.nr-play{position:absolute;left:1px;bottom:1px;width:11px;height:11px;pointer-events:none;
+  filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.9))}
+.nr-play svg{width:100%;height:100%;display:block}
+.nr-play .npl-tri{fill:#fff}
+
+/* --- detail modal --- */
+.ndet{display:flex;flex-direction:column;gap:12px}
+.nd-media{text-align:center;position:relative}
+.nd-img{max-width:100%;max-height:280px;border-radius:var(--r-sm);display:inline-block}
+.nd-warn{font-size:12.5px;line-height:1.5;background:var(--yellow-bg);border:1px solid var(--yellow-bd);
+  border-radius:var(--r-sm);padding:9px 11px;color:var(--text)}
+.nd-verdict{display:flex;flex-direction:column;gap:3px;padding:9px 11px;border-radius:var(--r-sm);
+  border:1px solid var(--border);background:var(--surface-2)}
+.nd-verdict b{font-size:13.5px}
+.nd-verdict span{font-size:12px;color:var(--text-2);line-height:1.5}
+.nd-v-star{background:var(--green-bg);border-color:var(--green-bd)}
+.nd-v-pot{background:var(--lgreen-bg);border-color:var(--lgreen-bd)}
+.nd-v-bad{background:var(--red-bg);border-color:var(--red-bd)}
+.nd-v-wait{background:var(--info-bg);border-color:var(--info-bd)}
+
+/* --- K6: „video reklama / statická reklama" v detailu, barevně zvýrazněné ------
+   Filip: „po rozkliknutí řádek 'video reklama / statická reklama', barevně
+   zvýrazněný." → vlastní pruh hned pod náhledem, ne zapadlá buňka v mřížce.
+   Modrá = video, jantarová = statika (obě z palety, ne od boku). */
+.nd-mt{display:flex;align-items:center;gap:7px;padding:7px 11px;border-radius:var(--r-sm);
+  font-size:12.5px;font-weight:700;border:1px solid transparent}
+.nd-mt svg{width:14px;height:14px;flex:0 0 auto;display:block}
+.nd-mt-video{background:var(--info-bg);border-color:var(--info-bd);color:var(--info)}
+.nd-mt-video svg{fill:var(--info)}
+/* Filip: statická reklama NENÍ varování → klidná neutrální (slate), ne žluto-oranžová. */
+.nd-mt-static{background:#eef1f4;border-color:#dde3ea;color:#4a5560}
+.nd-mt-static svg{fill:#6b7682}
+.nd-mt i{font-style:normal;font-weight:500;color:var(--text-2);font-size:11.5px}
+
+.nd-zral{display:flex;align-items:flex-start;gap:12px;padding:10px 11px;border:1px solid var(--border);
+  border-radius:var(--r-sm);background:var(--surface-2)}
+.nd-zt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.nd-zt b{font-size:13px}
+.nd-zt span{font-size:11.5px;color:var(--text-2);line-height:1.5}
+.nd-zf{color:var(--text-2)}
+.nd-zr{color:var(--text-3) !important;cursor:help;border-top:1px dashed var(--border);padding-top:4px;margin-top:2px}
+
+/* --- K1: rozklik seskupený do bloků -------------------------------------------
+   Filip: „ty obdélníčky dole jsou moc informací… chtěl bych to zpřehlednit, aby to
+   bylo seskupený víc do nějakejch skupinek, aby se mi to na první dobrou líp
+   skenovalo." → 12 buněk v jedné mřížce → 3 pojmenované bloky (Peníze · Funnel ·
+   Stav) + Kvalita dat jako čtvrtý. Nadpis bloku je kotva pro oko; uvnitř bloku
+   spolu čísla souvisí, takže se dají porovnávat mezi sebou. */
+/* Filip: bloky byly na sebe nalepené (bordery se slučovaly) → mezery mezi nimi. */
+.nd-blks{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.nd-blk{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--surface)}
+.nd-blk-h{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface-2);
+  border-bottom:1px solid var(--border)}
+.nd-blk-i{font-size:12px;line-height:1}
+.nd-blk-t{font-size:11px;font-weight:700;color:var(--text-2);letter-spacing:.05em;text-transform:uppercase}
+.nd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1px;
+  background:var(--border)}
+.nd-kv{display:flex;flex-direction:column;gap:2px;padding:7px 9px;background:var(--surface)}
+.nd-k{font-size:10.5px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.nd-v{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.nd-v .sem-green{color:var(--green)} .nd-v .sem-lgreen{color:var(--lgreen)}
+.nd-v .sem-yellow{color:var(--yellow)} .nd-v .sem-orange{color:var(--orange)}
+.nd-v .sem-red{color:var(--red)}
+.nd-sm{font-size:11px;color:var(--text-3);font-weight:500;font-style:normal}
+/* Stav „běží/vypnuto" uvnitř mřížky — ikonka + text, ať to není emoji (T9). */
+.nd-run{display:inline-flex;align-items:center;gap:5px}
+.nd-run svg{width:9px;height:9px;display:block;flex:0 0 auto}
+.nd-run.is-on  svg{fill:var(--green)}
+.nd-run.is-on  b{color:var(--green)}
+.nd-run.is-off svg{fill:var(--text-3)}
+.nd-run.is-off b{color:var(--text-3)}
+.nd-run b{font-size:13.5px;font-weight:700}
+
+.nd-ads{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden}
+.nd-ads-h{display:block;font-size:11.5px;padding:6px 9px;background:var(--surface-2);
+  border-bottom:1px solid var(--border)}
+.nd-ad{display:flex;align-items:center;gap:8px;padding:5px 9px;font-size:11.5px;
+  border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nd-ad:last-child{border-bottom:0}
+.nd-ad-d{color:var(--text-2);font-variant-numeric:tabular-nums;min-width:74px}
+.nd-ad-st{font-size:10px;font-weight:700;border-radius:var(--r-pill);padding:1px 6px}
+.nd-ad-st.st-on{background:var(--green-bg);color:var(--green)}
+.nd-ad-st.st-off{background:var(--surface-3);color:var(--text-3)}
+.nd-ad-st.st-mid{background:var(--yellow-bg);color:var(--yellow)}
+.nd-ad-c{font-family:var(--mono);font-size:10.5px;color:var(--text-2);flex:1 1 90px;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nd-ad-s{font-weight:700;font-variant-numeric:tabular-nums;margin-left:auto}
+
+/* --- F7/C1: SPEND ZA 7 DNÍ ------------------------------------------------------------
+   Filip: „aspoň spend za posledních sedm dnů, že by bylo pole u toho stavu."
+   Číslo + sedm proužků pod ním (výška = podíl na maximu týdne). Bez grafové knihovny:
+   je to sedm hodnot, ECharts by tu byl zbytečný a zpomalil by otevření detailu.
+   Dny bez spendu drží minimální výšku 3px — ať je vidět, že den existuje a je nulový,
+   ne že chybí. */
+.nd-sp7{font-weight:700;font-variant-numeric:tabular-nums}
+.nd-sp7.is-load{color:var(--text-3);font-weight:500;font-style:italic}
+.nd-sp7.nd-sp7-zero{color:var(--text-3)}
+.nd-sp7bars{display:flex;align-items:flex-end;gap:3px;height:28px;margin:2px 0 6px;padding-left:1px}
+.nd-sp7bars[hidden]{display:none}
+.nd-sp7b{width:9px;border-radius:2px 2px 0 0;background:var(--accent);opacity:.75;cursor:help}
+.nd-sp7b.is-off{background:var(--text-3);opacity:.28}
+/* spend reklamy za 7 dní — vedle jejího celkového spendu, jen když něco utratila */
+.nd-ad-s7{font-size:10.5px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;
+  white-space:nowrap;display:none}
+.nd-ad-s7.is-on{display:inline}
+.nd-ad-l{font-size:10.5px;color:var(--accent);text-decoration:none;white-space:nowrap}
+.nd-ad-l:hover{text-decoration:underline}
+/* --- F7/D7: FLAGY (poznámky ke kreativě) v detailu ------------------------------------
+   Seznam = datum · text · kdo · křížek. Datum je vlevo a s tabular-nums, ať jde sloupec
+   poznámek číst svisle jako časová osa („co jsme o té kreativě kdy věděli"). */
+.nd-flags{margin-top:12px;padding:10px 12px;background:var(--surface-2);border-radius:var(--r-md)}
+.nd-flags-h{display:block;font-size:12px;margin-bottom:7px}
+.nd-flags-none{font-size:11.5px;color:var(--text-3);font-style:italic;padding:2px 0 6px}
+.nd-flag{display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:11.5px;
+  border-bottom:1px solid var(--border)}
+.nd-flag:last-child{border-bottom:0}
+.nd-flag-d{color:var(--text-3);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:72px}
+.nd-flag-t{flex:1;min-width:0;color:var(--text);word-break:break-word}
+.nd-flag-w{color:var(--text-3);font-size:10.5px;white-space:nowrap}
+.nd-flag-src{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+  color:var(--text-3);background:var(--surface-3);border-radius:var(--r-pill);padding:1px 6px;white-space:nowrap}
+.nd-flag-x{background:transparent;border:0;color:var(--text-3);font-size:15px;line-height:1;
+  cursor:pointer;padding:0 2px;border-radius:var(--r-sm)}
+.nd-flag-x:hover{color:#a3413a}
+.nd-flag-x:disabled{opacity:.4;cursor:default}
+.nd-flags-add{display:flex;gap:6px;margin-top:8px}
+.nd-flag-in{flex:1;min-width:0;height:28px;padding:0 9px;font-family:inherit;font-size:11.5px;
+  color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill)}
+.nd-flag-in:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+.nd-flag-in:disabled{opacity:.6}
+
+.nd-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+
+/* --- K4: kill z rozkliknutého detailu -----------------------------------------
+   Filip: „chtěl bych tam mít možnost kilnout přímo z té karty. Nemusí být to
+   tlačítko na té kartě, ale může to být po rozkliknutí."
+   → na dlaždici JEN stavová tečka, akce až tady.
+
+   PROČ potvrzení INLINE a ne v druhém modalu: ADS._modal() volá na začátku
+   _closeModal() → druhý modal by zavřel ten detail, ze kterého jsem kill spustil,
+   a po „Zrušit" by Filip koukal na prázdnou obrazovku. Rozbalovací pruh uvnitř
+   detailu tenhle problém nemá vůbec. */
+.nd-kill{margin-left:0;margin-right:auto}
+.nk-box{border:1px solid var(--red-bd);background:var(--red-bg);border-radius:var(--r-sm);
+  padding:9px 11px;display:flex;flex-direction:column;gap:7px}
+.nk-t{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.45}
+.nk-t b{color:var(--red)}
+.nk-r{display:block;font-size:11px;font-weight:600;color:var(--text-2)}
+.nk-r textarea{display:block;width:100%;box-sizing:border-box;margin-top:4px;resize:vertical;
+  border:1px solid var(--border);border-radius:var(--r-xs);padding:6px 8px;font:inherit;
+  font-size:12px;color:var(--text);background:var(--surface)}
+.nk-r textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft,rgba(168,106,120,.14))}
+.nk-a{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
+.nk-note{font-size:11px;color:var(--text-2);line-height:1.45;margin:0}
+
+/* --- NÁUŠNICE: souhrn slepé skvrny (FEEDBACK-5) ---
+   Není to alarm (nic se nemá killnout), je to UPOZORNĚNÍ na portfoliovou díru →
+   žlutá, ne červená. Červená je v tomhle dashboardu vyhrazená pro „kill teď". */
+.bs-sec{margin-bottom:14px}
+.bs-card{border:1px solid var(--yellow-bd);background:var(--yellow-bg);
+  border-radius:var(--r-md);overflow:hidden}
+.bs-h{display:flex;align-items:center;gap:10px;width:100%;padding:11px 13px;cursor:pointer;
+  background:none;border:0;font:inherit;color:inherit;text-align:left}
+.bs-h:hover{background:rgba(0,0,0,.03)}
+.bs-h:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.bs-chev{font-size:11px;color:var(--text-3);transition:transform .15s ease;flex:0 0 auto}
+.bs-card.is-open .bs-chev{transform:rotate(90deg)}
+.bs-ico{font-size:17px;flex:0 0 auto}
+.bs-txt{display:flex;flex-direction:column;gap:2px;flex:1 1 auto;min-width:0}
+.bs-t{font-size:13.5px;font-weight:700;line-height:1.35}
+.bs-sub{font-size:11.5px;color:var(--text-2);line-height:1.5}
+.bs-sub u{text-underline-offset:2px}
+.bs-pct{font-size:22px;font-weight:800;color:var(--orange);flex:0 0 auto;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.bs-b{display:none}
+.bs-card.is-open .bs-b{display:block;border-top:1px solid var(--yellow-bd);
+  background:var(--surface);max-height:420px;overflow:auto}
+.bs-note{margin:0;padding:9px 13px 6px;font-size:11.5px;color:var(--text-2);line-height:1.55}
+.bs-warn{color:var(--orange)}
+/* Slepá skvrna zůstává u CHIPŮ (kód + spálené peníze), ne u plných řádků jako
+   „Nedostaly prostor" (K3). Je to schválně: tohle je PORTFOLIOVÝ pohled — nese ho
+   to jedno velké číslo v hlavičce a seznam je jen důkaz „kdo přesně to je".
+   Filipův požadavek na celé řádky padl na „Nedostaly prostor"; sem ho nerozšiřuju
+   sám od sebe (jiný tab, jiná otázka). → nabídnuto v notes. */
+.bs-codes{display:flex;flex-wrap:wrap;gap:5px;padding:4px 13px 12px}
+.bs-c{font-family:var(--mono);font-size:10.5px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:var(--r-xs);padding:2px 6px;white-space:nowrap}
+.bs-c i{color:var(--text-3);font-style:normal;font-variant-numeric:tabular-nums}
+
+@media(max-width:640px){
+  .ngrid{grid-template-columns:repeat(auto-fill,minmax(142px,1fr))}
+  .ngrp-sub,.nstrip-sub{display:none}
+  .bs-sub{display:none}
+  .bs-pct{font-size:18px}
+}

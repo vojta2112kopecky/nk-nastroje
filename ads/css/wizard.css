@@ -1,0 +1,374 @@
+/* =============================================================================
+ * NK Ads Dashboard — styly WIZARDU „Denní HECK"  (public/css/wizard.css)
+ *
+ * PROČ vlastní soubor a ne styles.css: wizard je samostatný overlay, na kterém dělá
+ * jiný člověk/agent než na shellu. Jeden sdílený styles.css = přepisování si pod rukama.
+ * Všechno je scopované prefixem `.hw-` → nemůže to vytéct do zbytku appky.
+ *
+ * PROČ ne <style> v JS (jak to bylo do 17. 7.): 300 řádků CSS v template stringu se
+ * needituje, neformátuje a nedá se cachovat. Přesunuto 1:1 (žádná změna vzhledu),
+ * nové bloky jsou vespod a jsou označené.
+ *
+ * ⚠️ NAČÍTÁ SE SÁM: wizard.js si <link> injektuje (idempotentně, verzi bere ze svého
+ * vlastního ?v=). Když ho index.html nalinkuje taky, wizard.js to pozná a druhý
+ * nepřidá. Nesmí se stát, že soubor nikdo nenačte = wizard bez stylů.
+ * ========================================================================== */
+
+.hw-overlay{position:fixed;inset:0;z-index:8000;display:flex;flex-direction:column;
+  background:rgba(38,34,30,.46);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:#2c2925;animation:hw-fade .18s ease;}
+@keyframes hw-fade{from{opacity:0}to{opacity:1}}
+.hw-panel{margin:auto;width:min(1080px,96vw);height:min(92vh,940px);display:flex;flex-direction:column;
+  background:#fffdf9;border:1px solid #ece6dc;border-radius:18px;overflow:hidden;
+  box-shadow:0 24px 70px rgba(40,32,22,.30),0 2px 8px rgba(40,32,22,.12);}
+/* Hlavička */
+.hw-head{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #efe9df;background:#fffefb;}
+.hw-badge{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#b23b3b;
+  background:#fbe7e4;border:1px solid #f4cfc9;padding:4px 9px;border-radius:8px;}
+.hw-title{font-size:17px;font-weight:700;margin:0;color:#2c2925;}
+.hw-sub{font-size:12.5px;color:#8b8378;margin-top:1px;}
+.hw-x{margin-left:auto;width:34px;height:34px;border-radius:9px;border:1px solid #ece6dc;background:#fff;
+  color:#7a7266;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .12s;}
+.hw-x:hover{background:#f6f1e9;color:#3a352e;}
+/* autosave chip (J4) — stav průběžného ukládání */
+.hw-savechip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;border-radius:20px;
+  padding:4px 10px;border:1px solid #e9e2d5;background:#f7f3ec;color:#8b8378;white-space:nowrap;margin-left:6px;}
+.hw-savechip.is-saved{background:#e9f5ee;border-color:#c6e6d3;color:#1f8a54;}
+.hw-savechip.is-saving,.hw-savechip.is-pending{background:#f4efe6;border-color:#e6ddcd;color:#8a7a52;}
+.hw-savechip.is-error{background:#fbe7e4;border-color:#f2cfc9;color:#b8322e;cursor:help;}
+/* Progress — J1: kroky jsou KLIKACÍ, navigace se nikdy neblokuje */
+.hw-steps{display:flex;gap:6px;padding:14px 20px;border-bottom:1px solid #efe9df;background:#fbf8f2;overflow-x:auto;}
+.hw-stepbtn{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:7px 12px;border-radius:10px;
+  background:transparent;border:1px solid transparent;font-size:13px;color:#9a9186;white-space:nowrap;
+  font-family:inherit;cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+.hw-stepbtn:hover{background:#fff;border-color:#e9e2d5;color:#3a352e;}
+.hw-stepbtn .hw-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;background:#efe8dd;color:#9a9186;border:1px solid #e3dccf;flex:0 0 auto;}
+.hw-stepbtn.is-done .hw-dot{background:#1f8a54;color:#fff;border-color:#1f8a54;}
+/* nesplněný krok = vizuální varování (NE blokace) */
+.hw-stepbtn.is-todo{color:#8a6a12;}
+.hw-stepbtn.is-todo .hw-dot{background:#fbf1d0;color:#9a6b12;border-color:#eccf7f;}
+.hw-stepbtn.is-error{color:#b8322e;}
+.hw-stepbtn.is-error .hw-dot{background:#fbe7e4;color:#b8322e;border-color:#f2cfc9;}
+.hw-stepbtn.is-loading .hw-dot{opacity:.65;}
+.hw-stepbtn.is-active{background:#fff;border-color:#e6cf86;color:#3a352e;font-weight:600;
+  box-shadow:0 1px 3px rgba(60,48,20,.08);}
+.hw-stepbtn.is-active .hw-dot{background:#3a352e;color:#fff;border-color:#3a352e;}
+.hw-stepbtn.is-active.is-todo .hw-dot{background:#c98a12;color:#fff;border-color:#c98a12;}
+.hw-stepbtn:focus-visible{outline:2px solid #e0b95a;outline-offset:1px;}
+.hw-stepn{font-size:10.5px;font-weight:800;line-height:1;color:#8a6a12;background:#fbf1d0;border:1px solid #eccf7f;
+  border-radius:20px;padding:2px 6px;margin-left:2px;}
+/* Tělo */
+.hw-body{flex:1;overflow-y:auto;padding:22px 24px;}
+.hw-steptitle{font-size:19px;font-weight:700;margin:0 0 3px;color:#2c2925;}
+.hw-stepdesc{font-size:13.5px;color:#8b8378;margin:0 0 18px;max-width:760px;line-height:1.5;}
+.hw-counter{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:#6f6659;
+  background:#f4efe6;border:1px solid #e9e2d5;border-radius:20px;padding:4px 11px;margin-left:8px;}
+.hw-counter.is-ready{color:#1f8a54;background:#e6f4ec;border-color:#c6e6d3;}
+/* Karty položek */
+.hw-card{background:#fff;border:1px solid #ece6dc;border-radius:14px;padding:14px 16px;margin-bottom:12px;
+  box-shadow:0 1px 2px rgba(60,48,20,.05);transition:border-color .15s,box-shadow .15s;}
+.hw-card.is-resolved{border-color:#cfe7d8;background:#fcfefc;}
+.hw-card.is-flag{border-color:#f2d7a6;background:#fffdf6;}
+.hw-card.is-killed{border-color:#e6d3d0;background:#fbf6f5;}
+
+/* --- F7/D3: SLOŽENÁ KARTA PO ROZHODNUTÍ ---------------------------------------------
+   Filip 23. 7.: „ať se to kolapsne a bude tam jenom název kreativy a malá miniaturka,
+   ať je to přehlednější, ať nezabírá tak vysokou část. Jo, animovaně, aby to bylo pěkný."
+   Nic se nepřestavuje — jen se schová všechno kromě jména, miniatury a odznaku.
+   `is-collapsing` nasazuje JS na chvíli přechodu (měří výšku a dojede na cílovou),
+   `is-collapsed` je pak trvalý stav odvozený z „karta je vyřešená".
+   ⚠️ overflow:hidden JEN u složené/skládané karty — na rozbalené by ořízl hover popupy. */
+.hw-card.is-collapsing{overflow:hidden;transition:max-height .24s ease,opacity .24s ease;}
+.hw-card.is-collapsed{overflow:hidden;padding:9px 16px;margin-bottom:8px;cursor:pointer;}
+.hw-card.is-collapsed:hover{border-color:#d8cdb8;box-shadow:0 2px 8px rgba(60,48,20,.09);}
+.hw-card.is-collapsed .hw-copy,
+.hw-card.is-collapsed .hw-metrics,
+.hw-card.is-collapsed .hw-why,
+.hw-card.is-collapsed .hw-decide,
+.hw-card.is-collapsed .hw-note,
+.hw-card.is-collapsed .hw-select,
+.hw-card.is-collapsed .hw-chart,
+.hw-card.is-collapsed .hw-chartwrap,
+.hw-card.is-collapsed .hw-scalenote,
+.hw-card.is-collapsed .hw-chart-msg{display:none !important;}
+/* miniatura se zmenší na „řádkovou" velikost (Filipovo „malá miniaturka") */
+.hw-card.is-collapsed .hw-thumb{width:34px;height:34px;border-radius:7px;}
+.hw-card.is-collapsed .hw-crow{align-items:center;gap:10px;}
+.hw-card.is-collapsed .hw-cname{font-size:13.5px;}
+/* odznak rozhodnutí — ve složeném stavu jediná informace navíc vedle názvu */
+.hw-done{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.02em;padding:2px 9px;
+  border-radius:999px;white-space:nowrap;border:1px solid transparent;}
+.hw-done.is-ok,.hw-done.is-keep{color:#1f8a54;background:#e6f4ec;border-color:#c6e6d3;}
+.hw-done.is-kill{color:#a3413a;background:#f7ebe9;border-color:#e6d3d0;}
+.hw-done.is-flag{color:#8a6a1f;background:#fdf4e2;border-color:#f0dfb4;}
+@media (prefers-reduced-motion: reduce){
+  .hw-card.is-collapsing{transition:none;}
+}
+
+.hw-crow{display:flex;gap:14px;align-items:flex-start;}
+.hw-thumb{width:60px;height:60px;flex:0 0 auto;border-radius:10px;object-fit:cover;background:#f2ede4;
+  border:1px solid #e9e2d5;cursor:pointer;transition:transform .12s,box-shadow .12s;}
+.hw-thumb:hover{transform:scale(1.04);box-shadow:0 3px 10px rgba(60,48,20,.18);}
+.hw-thumb.hw-ph{display:flex;align-items:center;justify-content:center;color:#c4bbab;font-size:22px;cursor:default;}
+.hw-cmain{flex:1;min-width:0;}
+.hw-cname{font-weight:700;font-size:14.5px;color:#2c2925;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hw-copy{font-size:12.5px;color:#948b7f;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:520px;}
+.hw-metrics{display:flex;flex-wrap:wrap;gap:5px 16px;margin-top:9px;}
+.hw-metric{font-size:12px;color:#6f6659;display:flex;flex-direction:column;line-height:1.25;}
+.hw-metric b{font-size:13.5px;color:#33302a;font-weight:700;}
+.hw-metric.hw-burn b{color:#b23b3b;}
+/* chips */
+.hw-chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;border-radius:7px;padding:3px 8px;
+  border:1px solid transparent;}
+.hw-chip-funnel{background:#eef1f6;color:#4a5568;border-color:#dde3ec;}
+.hw-chip-layer{background:#fbe7e4;color:#b23b3b;border-color:#f2cfc9;}
+.hw-chip-reason{background:#f4efe6;color:#6f6659;border-color:#e6ddcd;}
+.hw-chip-warn{background:#fdf0d6;color:#9a6b12;border-color:#f2dca3;}
+.hw-chip-scale{background:#e6f4ec;color:#1f8a54;border-color:#c6e6d3;}
+/* --- A4: ZRALOST — barevný kroužek (< 25 č · 25–50 o · 50–75 ž · > 75 z) ---
+   Kroužek = conic-gradient prstenec; --p je % zralosti, ::after vykrojí střed. */
+.hw-ring{--p:0;width:15px;height:15px;border-radius:50%;flex:0 0 auto;position:relative;display:inline-block;
+  vertical-align:-2px;margin-right:5px;background:conic-gradient(var(--rc,#b8322e) calc(var(--p) * 1%),#e9e2d5 0);}
+.hw-ring::after{content:'';position:absolute;inset:3.5px;border-radius:50%;background:#fff;}
+.hw-ring.is-red{--rc:#b8322e;} .hw-ring.is-orange{--rc:#c9701a;}
+.hw-ring.is-yellow{--rc:#c9a227;} .hw-ring.is-green{--rc:#1f8a54;}
+.hw-ring.is-none{--rc:#d8d0c2;}
+.hw-zr{cursor:help;}
+.hw-zr b{white-space:nowrap;}
+/* semafor pill */
+.hw-sem{display:inline-flex;align-items:center;font-size:12.5px;font-weight:800;border-radius:7px;padding:3px 9px;min-width:44px;justify-content:center;}
+.hw-sem-green{background:#e0f3e8;color:#137a44;}
+.hw-sem-lgreen{background:#eef6da;color:#5c8a12;}
+.hw-sem-yellow{background:#fbf1d0;color:#9a7712;}
+.hw-sem-orange{background:#fbe6cf;color:#b8681a;}
+.hw-sem-red{background:#fbdfdd;color:#b8322e;}
+/* trend */
+.hw-trend{font-size:12px;font-weight:700;}
+.hw-t-up{color:#b8322e;} .hw-t-down{color:#137a44;} .hw-t-flat{color:#948b7f;}
+/* segment control (rozhodnutí) */
+.hw-decide{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px dashed #eee5d6;}
+.hw-seg{display:inline-flex;background:#f4efe6;border:1px solid #e6ddcd;border-radius:10px;padding:3px;gap:2px;}
+.hw-segbtn{border:none;background:transparent;font-size:13px;font-weight:600;color:#6f6659;padding:6px 14px;border-radius:8px;
+  cursor:pointer;transition:all .12s;white-space:nowrap;}
+.hw-segbtn:hover{color:#33302a;}
+.hw-segbtn.is-on{background:#fff;color:#2c2925;box-shadow:0 1px 3px rgba(60,48,20,.12);}
+.hw-segbtn.is-kill.is-on{background:#b8322e;color:#fff;}
+.hw-segbtn.is-keep.is-on{background:#5b7cc4;color:#fff;}
+.hw-segbtn.is-ok.is-on{background:#1f8a54;color:#fff;}
+.hw-segbtn.is-flag.is-on{background:#c98a12;color:#fff;}
+.hw-segbtn.is-scale.is-on{background:#1f8a54;color:#fff;}
+.hw-segbtn.is-wait.is-on{background:#8b8378;color:#fff;}
+.hw-segbtn:disabled{opacity:.5;cursor:default;}
+.hw-select,.hw-note{font-family:inherit;font-size:13px;color:#33302a;background:#fff;border:1px solid #e2dacb;
+  border-radius:9px;padding:8px 10px;transition:border-color .12s;}
+.hw-select:focus,.hw-note:focus{outline:none;border-color:#e0b95a;box-shadow:0 0 0 3px rgba(224,185,90,.18);}
+.hw-note{width:100%;margin-top:8px;resize:vertical;min-height:38px;}
+.hw-note.is-required{border-color:#e6b96a;background:#fffdf6;}
+/* „PROČ" — které pravidlo/práh se spustil (podmínka smysluplného feedbacku, SPEC §5) */
+.hw-why{font-size:12px;color:#6f6659;background:#faf7f1;border:1px solid #ece2cf;border-left:3px solid #d9cdb4;
+  border-radius:0 9px 9px 0;padding:7px 10px;margin-top:9px;line-height:1.45;}
+.hw-why b{color:#4a463f;font-weight:700;}
+.hw-why code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;background:#f1ebe0;
+  border:1px solid #e6ddcd;border-radius:4px;padding:1px 5px;color:#6b6255;}
+.hw-killstate{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:9px;}
+.hw-killstate.ok{background:#f1eae8;color:#8a5652;}
+.hw-killstate.run{background:#eef1f6;color:#4a5568;}
+.hw-killstate.partial{background:#fbe7e4;color:#b8322e;}
+.hw-spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(120,110,95,.3);border-top-color:#7a7266;
+  display:inline-block;animation:hw-rot .7s linear infinite;}
+@keyframes hw-rot{to{transform:rotate(360deg)}}
+.hw-linkbtn{font-size:12px;color:#5b7cc4;text-decoration:none;font-weight:600;}
+.hw-linkbtn:hover{text-decoration:underline;}
+/* funnel/event tabulka jako karty s rozhodnutím */
+.hw-frow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.hw-fmeta{display:flex;flex-wrap:wrap;gap:4px 18px;flex:1;min-width:220px;}
+/* --- H3: OBDOBÍ u každého kroku (Filip: „za jakou dobu to porovnáváme?") --- */
+.hw-period{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#f7f3ec;border:1px solid #e9e2d5;
+  border-radius:11px;padding:9px 13px;margin:0 0 16px;font-size:13px;color:#5f574a;}
+.hw-period .cal{font-size:14px;}
+.hw-period b{color:#33302a;font-weight:700;}
+.hw-period .hw-pdays{font-size:11.5px;font-weight:800;color:#8a6a12;background:#fbf1d0;border:1px solid #eccf7f;
+  border-radius:20px;padding:2px 8px;}
+.hw-period .hw-pnote{color:#948b7f;font-size:12.5px;}
+/* --- H4/H5: ovládací lišta kroku (moderní chipy — „hezký batny, ne hnusný") --- */
+.hw-ctl{display:flex;flex-direction:column;gap:10px;margin:0 0 16px;}
+.hw-ctlrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.hw-ctllbl{font-size:12px;font-weight:700;color:#8b8378;text-transform:uppercase;letter-spacing:.05em;flex:0 0 auto;}
+.hw-chips{display:inline-flex;flex-wrap:wrap;gap:6px;}
+.hw-chipbtn{font-family:inherit;font-size:12.5px;font-weight:600;color:#6f6659;background:#fff;border:1px solid #e6ddcd;
+  border-radius:20px;padding:6px 13px;cursor:pointer;transition:all .13s;white-space:nowrap;line-height:1.15;}
+.hw-chipbtn:hover{border-color:#d3c39a;background:#fdfbf6;color:#33302a;transform:translateY(-1px);}
+.hw-chipbtn.is-on{background:#33302a;border-color:#33302a;color:#fff;box-shadow:0 2px 7px rgba(50,42,28,.22);}
+.hw-chipbtn.is-on:hover{background:#26241f;transform:none;}
+.hw-chipbtn:focus-visible{outline:2px solid #e0b95a;outline-offset:2px;}
+.hw-chipbtn .n{opacity:.6;font-weight:700;margin-left:4px;font-size:11px;}
+.hw-filtnote{font-size:12.5px;color:#8a6a12;background:#fbf1d0;border:1px solid #eccf7f;border-radius:9px;
+  padding:6px 11px;}
+/* --- Grafy v kartách (ECharts; osa Y VŽDY od 0) --- */
+.hw-chart{margin-top:11px;border-top:1px dashed #eee5d6;padding-top:10px;}
+.hw-chart-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:2px;}
+.hw-chart-t{font-size:11.5px;font-weight:700;color:#8b8378;text-transform:uppercase;letter-spacing:.04em;}
+.hw-chart-sub{font-size:11.5px;color:#a89f90;}
+.hw-canvas{width:100%;height:104px;}
+.hw-canvas.is-mini{height:58px;}
+.hw-chart-msg{font-size:12.5px;color:#a29786;padding:14px 0;text-align:center;}
+.hw-sparks{display:flex;gap:10px;flex-wrap:wrap;margin-top:11px;border-top:1px dashed #eee5d6;padding-top:10px;}
+.hw-spark{flex:0 1 240px;min-width:132px;max-width:280px;}
+.hw-spark-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-bottom:1px;}
+.hw-spark-l{font-size:11px;font-weight:700;color:#8b8378;text-transform:uppercase;letter-spacing:.04em;}
+.hw-spark-v{font-size:12.5px;font-weight:800;color:#33302a;}
+/* graf vs. čísla: hlídka atribuce spendu (viz komentář u chartMismatch) */
+.hw-chartwarn{font-size:11.5px;color:#9a6b12;background:#fdf6e6;border:1px solid #f2dca3;border-radius:7px;
+  padding:4px 8px;margin-top:5px;line-height:1.4;}
+/* --- N7: pill s krátkým důvodem + „?" → popup s detailem --- */
+.hw-chip-layer.hw-haspop{cursor:help;}
+.hw-chip-layer .hw-i{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;
+  border-radius:50%;background:rgba(178,59,59,.16);color:#b23b3b;font-size:9px;font-weight:800;margin-left:5px;}
+.hw-chip-layer.hw-haspop:hover{background:#f8d9d4;border-color:#e9b7ae;}
+.hw-textpop{position:fixed;z-index:8300;display:none;max-width:360px;padding:11px 13px;background:#fffdf9;
+  border:1px solid #ece6dc;border-radius:11px;box-shadow:0 10px 34px rgba(30,25,15,.24);opacity:0;
+  transform:translateY(3px);transition:opacity .12s,transform .12s;pointer-events:none;font-size:12.5px;
+  color:#4a463f;line-height:1.5;}
+.hw-textpop.show{opacity:1;transform:translateY(0);}
+.hw-textpop b{color:#2c2925;}
+.hw-textpop .t{font-size:13px;font-weight:700;color:#b23b3b;margin-bottom:3px;}
+.hw-textpop .d{color:#5f574a;}
+.hw-textpop .m{margin-top:6px;padding-top:6px;border-top:1px dashed #eee5d6;color:#948b7f;font-size:11.5px;}
+.hw-textpop code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;background:#f1ebe0;
+  border:1px solid #e6ddcd;border-radius:4px;padding:1px 5px;color:#6b6255;}
+/* --- H2: hover náhled (velký thumbnail) --- */
+.hw-thumbpop{position:fixed;z-index:8300;display:none;padding:5px;background:#fff;border:1px solid #ece6dc;
+  border-radius:12px;box-shadow:0 10px 34px rgba(30,25,15,.24);opacity:0;transform:translateY(3px);
+  transition:opacity .12s,transform .12s;pointer-events:none;}
+.hw-thumbpop.show{opacity:1;transform:translateY(0);}
+.hw-thumbpop img{display:block;width:380px;height:380px;object-fit:cover;border-radius:8px;background:#f2ede4;}
+.hw-thumbwrap{position:relative;flex:0 0 auto;}
+.hw-zoom{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:50%;background:#fffdf9;
+  border:1px solid #e3dccf;color:#8b8378;font-size:10px;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;box-shadow:0 1px 3px rgba(60,48,20,.16);}
+.hw-thumbwrap:hover .hw-zoom{background:#33302a;border-color:#33302a;color:#fff;}
+/* --- H7: dashboard NEUMÍ škálovat → říct to nahlas --- */
+.hw-scalenote{display:flex;gap:10px;align-items:flex-start;background:#eef1f6;border:1px solid #dde3ec;
+  border-left:4px solid #5b7cc4;border-radius:0 12px 12px 0;padding:11px 14px;margin:0 0 16px;
+  font-size:13px;color:#3f4a60;line-height:1.5;}
+.hw-scalenote b{color:#2c3550;}
+.hw-scalenote a{color:#3f63b8;font-weight:700;}
+/* empty / loading / error stavy */
+.hw-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  padding:52px 20px;text-align:center;color:#8b8378;}
+.hw-state .hw-emoji{font-size:40px;}
+.hw-state h4{margin:0;font-size:16px;color:#33302a;}
+.hw-state p{margin:0;font-size:13.5px;max-width:440px;line-height:1.5;}
+.hw-loader{width:30px;height:30px;border-radius:50%;border:3px solid #eee3d0;border-top-color:#c99a2f;animation:hw-rot .8s linear infinite;}
+/* --- G2: skupiny uvnitř kroku (nové kreativy vs. re-uploady) --- */
+.hw-group{margin:20px 0 10px;}
+.hw-group:first-of-type{margin-top:6px;}
+.hw-group-t{font-size:14px;font-weight:700;color:#33302a;display:flex;align-items:center;gap:8px;}
+.hw-group-n{font-size:11.5px;font-weight:800;color:#6f6659;background:#f4efe6;border:1px solid #e6ddcd;
+  border-radius:20px;padding:2px 8px;}
+.hw-group-note{font-size:12.5px;color:#8b8378;margin-top:3px;line-height:1.5;max-width:760px;}
+/* --- „Potvrdit zbývající" (SPEC §5: potvrď PŘEHLED) --- */
+.hw-bulk{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;background:#fbf8f2;border:1px solid #ece2cf;
+  border-radius:12px;padding:12px 16px;margin-bottom:4px;}
+.hw-bulk-t{font-size:13.5px;font-weight:700;color:#33302a;flex:0 0 auto;}
+.hw-bulk-n{font-size:12.5px;color:#8b8378;flex:1;min-width:220px;line-height:1.45;}
+.hw-btn-ok{background:#1f8a54;color:#fff;font-size:13px;padding:8px 15px;border-radius:10px;flex:0 0 auto;}
+.hw-btn-ok:hover:not(:disabled){background:#18723f;}
+/* checkbox ack */
+.hw-ack{display:flex;gap:11px;align-items:flex-start;background:#fbf8f2;border:1px solid #ece2cf;border-radius:12px;
+  padding:14px 16px;cursor:pointer;margin-top:6px;}
+.hw-ack input{margin-top:2px;width:18px;height:18px;accent-color:#1f8a54;flex:0 0 auto;}
+.hw-ack .t{font-size:13.5px;color:#4a463f;line-height:1.5;}
+.hw-ack .t b{color:#2c2925;}
+/* J2 — „co ještě chybí" nad souhrnem (klik = skok na krok + kartu) */
+.hw-missbox{background:#fffdf6;border:1px solid #f0dca9;border-left:4px solid #e0b95a;border-radius:0 13px 13px 0;
+  padding:14px 16px;margin-bottom:18px;}
+.hw-misshead{font-size:14.5px;font-weight:700;color:#8a6a12;display:flex;align-items:center;gap:8px;}
+.hw-missnote{font-size:12.5px;color:#8b8378;margin:5px 0 11px;line-height:1.5;}
+.hw-missitem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font-family:inherit;font-size:13px;
+  background:#fff;border:1px solid #efe4cd;border-radius:9px;padding:8px 12px;margin-bottom:6px;cursor:pointer;
+  transition:border-color .12s,box-shadow .12s,transform .12s;}
+.hw-missitem:hover{border-color:#e0b95a;box-shadow:0 2px 8px rgba(160,120,30,.13);transform:translateX(2px);}
+.hw-missitem:last-child{margin-bottom:0;}
+.hw-misstep{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9a8a6a;
+  background:#faf5e9;border:1px solid #eee0c2;border-radius:6px;padding:2px 7px;flex:0 0 auto;}
+.hw-misslabel{font-weight:700;color:#33302a;flex:0 0 auto;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hw-misshint{color:#8b8378;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hw-missgo{margin-left:auto;color:#c98a12;font-weight:700;font-size:12px;flex:0 0 auto;}
+.hw-okbox{background:#f2faf5;border:1px solid #c6e6d3;border-left:4px solid #1f8a54;border-radius:0 13px 13px 0;
+  padding:13px 16px;margin-bottom:18px;font-size:13.5px;color:#1f6b45;line-height:1.5;}
+.hw-okbox b{color:#155f39;}
+/* zvýraznění karty po skoku ze souhrnu */
+@keyframes hw-flash{0%{box-shadow:0 0 0 0 rgba(224,185,90,.75);}100%{box-shadow:0 0 0 10px rgba(224,185,90,0);}}
+.hw-card.hw-flash,.hw-ack.hw-flash{border-color:#e0b95a !important;animation:hw-flash 1.1s ease-out 2;}
+/* souhrn */
+.hw-sumgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+.hw-sumtile{background:#fff;border:1px solid #ece6dc;border-radius:13px;padding:14px 16px;}
+.hw-sumtile .n{font-size:26px;font-weight:800;color:#2c2925;line-height:1;}
+.hw-sumtile .l{font-size:12px;color:#8b8378;margin-top:6px;}
+.hw-sumtile.kill .n{color:#b8322e;} .hw-sumtile.flag .n{color:#c98a12;} .hw-sumtile.scale .n{color:#1f8a54;}
+.hw-sumsec{margin-bottom:16px;}
+.hw-sumsec h5{font-size:13px;font-weight:700;color:#6f6659;text-transform:uppercase;letter-spacing:.05em;margin:0 0 8px;}
+.hw-sumitem{display:flex;gap:10px;align-items:center;font-size:13px;padding:7px 12px;background:#fff;border:1px solid #efe9df;
+  border-radius:9px;margin-bottom:6px;}
+.hw-sumitem .k{font-weight:700;color:#33302a;}
+.hw-sumitem .m{color:#8b8378;margin-left:auto;font-size:12px;}
+/* patička */
+.hw-foot{display:flex;align-items:center;gap:12px;padding:14px 22px;border-top:1px solid #efe9df;background:#fffefb;}
+.hw-hint{font-size:12.5px;color:#a29786;}
+.hw-btn{font-family:inherit;font-size:14px;font-weight:600;border-radius:11px;padding:10px 20px;cursor:pointer;
+  border:1px solid transparent;transition:all .13s;}
+.hw-btn:disabled{opacity:.45;cursor:not-allowed;}
+.hw-btn-ghost{background:#fff;border-color:#e2dacb;color:#6f6659;}
+.hw-btn-ghost:hover:not(:disabled){background:#f6f1e9;color:#33302a;}
+.hw-btn-primary{background:#33302a;color:#fff;}
+.hw-btn-primary:hover:not(:disabled){background:#26241f;}
+.hw-btn-save{background:#1f8a54;color:#fff;}
+.hw-btn-save:hover:not(:disabled){background:#18723f;}
+.hw-spacer{margin-left:auto;}
+/* vnořený confirm dialog */
+.hw-confirm{position:absolute;inset:0;z-index:8100;display:flex;align-items:center;justify-content:center;
+  background:rgba(38,34,30,.42);animation:hw-fade .12s ease;}
+.hw-confirm-box{width:min(420px,92%);background:#fffdf9;border:1px solid #ece6dc;border-radius:16px;padding:22px 22px 18px;
+  box-shadow:0 20px 60px rgba(40,32,22,.35);}
+.hw-confirm-box h4{margin:0 0 8px;font-size:16.5px;color:#2c2925;}
+.hw-confirm-box p{margin:0 0 18px;font-size:13.5px;color:#6f6659;line-height:1.5;}
+.hw-confirm-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+.hw-btn-danger{background:#b8322e;color:#fff;}
+.hw-btn-danger:hover:not(:disabled){background:#9c2723;}
+@media(max-width:640px){
+  .hw-panel{width:100vw;height:100vh;border-radius:0;}
+  .hw-metrics{gap:4px 12px;}
+  .hw-copy{max-width:70vw;}
+}
+
+/* =============================================================================
+ * FEEDBACK-6 (17. 7.)
+ * ========================================================================== */
+
+/* W1 — přepínač granularity grafu (Den / Týden / Měsíc).
+   Vizuálně ODDĚLENÝ od chipů „Čísla za" a „Graf": chipy jsou volba ROZSAHU a metriky,
+   tohle je volba OSY. Segmentovaný přepínač (jeden rám, dělené díly) to říká na první
+   pohled — Filip u ovládání grafů opakovaně odmítl „další řadu stejných puntíků". */
+.hw-seg-gran{display:inline-flex;border:1px solid #e6ddcd;border-radius:9px;overflow:hidden;
+  background:#fbf8f2;}
+.hw-seg-gran button{appearance:none;border:0;background:transparent;font-family:inherit;
+  font-size:12.5px;font-weight:600;color:#8b8378;padding:5px 12px;cursor:pointer;
+  border-left:1px solid #ece6dc;transition:background .12s,color .12s;}
+.hw-seg-gran button:first-child{border-left:0;}
+.hw-seg-gran button:hover{background:#fff;color:#3a352e;}
+.hw-seg-gran button.is-on{background:#3a352e;color:#fff;}
+.hw-seg-gran button:focus-visible{outline:2px solid #e0b95a;outline-offset:-2px;}
+
+/* Kontrakt 17. 7.: `zralost:0` (provolalo se prokazatelně nic) a `zralost:null`
+   (nedá se spočítat) jsou DVĚ RŮZNÉ VĚCI. Nula je tvrzení a smí mít barevný kroužek;
+   „nevíme" musí být vidět jako šedý PRÁZDNÝ prstenec — proto `is-none` (šedá --rc)
+   výš. Tady jen ztlumíme, ať se prázdný kroužek neplete s vynulovanou červenou. */
+.hw-ring.is-none{opacity:.6;}
+
+/* W1 — popiska „co graf ukazuje" pod hlavičkou grafu. Krátká (G9: pod grafy nepsat
+   zbytečnosti), ale MUSÍ tam být: sloupec za měsíc a bod za den nejsou totéž. */
+.hw-chart-sub b{color:#6f6659;font-weight:700;}
