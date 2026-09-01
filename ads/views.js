@@ -790,7 +790,7 @@ function main(ADS) {
         (on ? '<span class="vt-menu" data-act="menu" title="Možnosti view" role="button" tabindex="0">⋮</span>' : '') +
         '</button>';
     });
-    html += '<button class="vtab vt-new" type="button" data-act="new" title="Vytvoř si vlastní pohled — třeba „Zásnubní, ROAS pod 2, spend nad 5 000 Kč"">+ Nové view</button>';
+    html += '<button class="vtab vt-new" type="button" data-act="new" title="Vytvoř si vlastní pohled — třeba „CPL nad 500 Kč, spend nad 5 000 Kč"">+ Nové view</button>';
     html += '</div>';
 
     html += '<div class="vb-right">';
@@ -987,7 +987,7 @@ function main(ADS) {
         : (mode === 'edit'
           ? 'Úprava tohohle view — segment, filtry i zobrazení. Views jsou <b>sdílené pro celý tým</b>.'
           : 'Pohled = výběr ze serveru (segment) + tvoje doplňkové filtry. Views jsou <b>sdílené pro celý tým</b>.')) + '</p>' +
-      '<label class="vd-l">Název<input class="vd-in" id="vd-name" type="text" maxlength="40" value="' + esc(prefillName) + '" placeholder="např. Zásnubní pod break-even"></label>';
+      '<label class="vd-l">Název<input class="vd-in" id="vd-name" type="text" maxlength="40" value="' + esc(prefillName) + '" placeholder="např. Drahé leady"></label>';
 
     /* T3 — ikona záložky. Filip: JEN vlastní vstup (bez gridu předvoleb) + náhled. */
     body +=

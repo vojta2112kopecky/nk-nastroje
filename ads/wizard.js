@@ -1412,7 +1412,7 @@
 
   function headHTML() {
     const p = W.period;
-    const tabLabel = p.tab === 'earrings' ? 'Náušnice' : 'Prsteny';
+    const tabLabel = 'Reklamy';
     const sub =
       'Období ' + esc(F.date(p.from)) + ' – ' + esc(F.date(p.to)) +
       ' · ' + esc(tabLabel) + ' · ' + esc(p.who);

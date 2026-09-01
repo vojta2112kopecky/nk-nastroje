@@ -2045,7 +2045,7 @@
     var srv = (err && err.body && (err.body.error || err.body.message)) || '';
     var msg;
     if (status === 400) {
-      msg = 'Server tuhle metriku pro tab „' + (tab === 'earrings' ? 'Náušnice' : 'Prsteny') + '" nezná: ' +
+      msg = 'Server tuhle metriku pro tab „' + 'Reklamy' + '" nezná: ' +
             (md && md.label ? md.label : sel.metricId) + ' (' + (md && md.key) + ' / split ' +
             (tab === 'earrings' ? EARRINGS_SPLIT : sel.split) + ')' + (srv ? ' — ' + srv : '');
     } else if (status === 401) {

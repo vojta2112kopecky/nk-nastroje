@@ -662,7 +662,7 @@ function main(ADS) {
 
     return '<div style="max-width:660px;font-size:13.5px;line-height:1.5">' +
       '<h4 style="margin:0 0 8px">Životní cyklus reklamy</h4>' + cyc +
-      '<h4 style="margin:16px 0 6px">Kill pravidla' + (tab === 'earrings' ? ' — náušnice' : '') + '</h4>' +
+      '<h4 style="margin:16px 0 6px">Kill pravidla' + '' + '</h4>' +
       '<div style="font-size:12px;color:#8a8172;margin-bottom:7px">' +
       '<b style="color:' + C.L + '">L</b> = leadové · <b style="color:' + C.R + '">R</b> = rezervační · ' +
       '<b style="color:' + C.B + '">B</b> = break-even' + (tab === 'earrings' ? ' · <b style="color:' + C.N + '">N</b> = náušnicové' : '') +
@@ -681,7 +681,7 @@ function main(ADS) {
         var sec = ev.currentTarget.closest('.sec');
         var isEar = sec && String(sec.getAttribute('data-sec') || '').indexOf('ear') === 0;
         ADS._modal(killLegendHTML(isEar ? 'earrings' : 'rings'),
-                   { title: isEar ? 'Pravidla killů — náušnice' : 'Pravidla killů a gaty' });
+                   { title: 'Pravidla killů a gaty' });
       });
     }
   }
@@ -2237,7 +2237,7 @@ function main(ADS) {
       '<div class="tm-title">📈 <span class="tm-code">' + esc(creative) + '</span>' +
       (d.funnel ? '<span class="chip chip-funnel" title="' + esc(d.funnel) + '">' + esc(d.funnel) + '</span>' : '') +
       '</div>' +
-      '<div class="tm-sub">' + esc(tab === 'earrings' ? 'Náušnice' : 'Prsteny') +
+      '<div class="tm-sub">' + esc('Reklamy') +
       ' · <span class="tm-range">' + esc(fmtDate(from)) + ' – ' + esc(fmtDate(to)) + '</span></div>' +
       '</div>' +
       /* ★ G8 — VLASTNÍ OBDOBÍ GRAFU KREATIVY. Filip: „chtěl bych tam mít možnost, aby jsem

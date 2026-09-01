@@ -109,7 +109,7 @@
     /* ---- Break-even ---- */
     FUNNEL_BREAKEVEN_DEFAULT: {
       s: 'breakeven', label: 'Break-even ROAS', type: 'roas', unit: '×', min: 0, max: 20, step: 0.1, impact: 'kill',
-      desc: 'Hranice, pod kterou kreativa prodělává. Platí PLOŠNĚ pro všechny funnely včetně náušnic (Filip: dvě různé linky v jednom grafu se nedají porovnat očima). Kotví se na ROAS model. Kreslí se jako referenční linka v grafech a spouští kill vrstvu 4 (zralá kreativa pod break-even). Je to SAFE hranice — reálný break-even je vyšší, počítá se s tím, že se ne všechna tržba dotrackuje.',
+      desc: 'Hranice, pod kterou kreativa prodělává. Platí plošně pro všechny funnely. Kotví se na ROAS model. Kreslí se jako referenční linka v grafech a spouští kill vrstvu 4 (zralá kreativa pod break-even). Je to SAFE hranice — reálný break-even je vyšší, počítá se s tím, že se ne všechna tržba dotrackuje.',
       danger: function (v) { return v <= 0 ? 'Break-even 0 vypne kill vrstvu 4 — žádná zralá kreativa už nebude označená jako prodělečná a linka v grafech zmizí.' : ''; }
     },
 
@@ -131,12 +131,12 @@
     /* ---- Kill prahy ---- */
     SPEND_NO_LEAD_MIN: {
       s: 'kill', label: 'Kill 1 — utraceno bez jediného leadu', type: 'money', unit: 'Kč', min: 0, max: 100000, step: 50, impact: 'kill',
-      desc: 'Kolik smí kreativa spálit úplně bez leadu, než ji dashboard navrhne zabít. Pod touhle částkou se bere jako „čekáme na data" a v kill sekci se vůbec neukáže. U náušnic tuhle hodnotu běžně přebíjí dynamický práh (viz sekce Náušnice).',
+      desc: 'Kolik smí kreativa spálit úplně bez leadu, než ji dashboard navrhne zabít. Pod touhle částkou se bere jako „čekáme na data" a v kill sekci se vůbec neukáže.',
       danger: function (v) { return v <= 0 ? 'Nula znamená, že kill kandidát je každá kreativa hned po startu — ještě než stihne přinést první lead.' : ''; }
     },
     CPL_EXTREME: {
       s: 'kill', label: 'Kill 3 — extrémní cena za lead', type: 'money', unit: 'Kč', min: 0, max: 100000, step: 50, impact: 'kill',
-      desc: 'Cena za lead, nad kterou je kreativa automaticky kill kandidát. Náušnice mají vlastní hodnotu (jejich „lead" je poptávka po páru za 19 990 Kč, ne vyplněný formulář) — viz sekce Náušnice.',
+      desc: 'Cena za lead, nad kterou je kreativa automaticky kill kandidát.',
       danger: function (v) { return v <= 0 ? 'Nula označí za extrémní CPL úplně každou kreativu, která má aspoň jeden lead.' : ''; }
     },
     TICHY_MIN_LEADS: {
@@ -176,7 +176,7 @@
           if (!p || p <= 0 || p >= 1 || !(v > 0 && v < 1)) return;
           var n = Math.ceil(Math.log(v) / Math.log(1 - p));
           var u = UNIT[tab] || ['', '', ''];
-          out.push((tab === 'rings' ? 'prsteny' : 'náušnice') + ': ≥ ' + n + ' ' + plural(n, u[0], u[1], u[2]));
+          out.push('kreativy: ≥ ' + n + ' ' + plural(n, u[0], u[1], u[2]));
         });
         return out.length ? '→ minimální vzorek pro kill: ' + out.join(' · ') : '';
       },

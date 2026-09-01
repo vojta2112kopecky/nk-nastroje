@@ -502,7 +502,7 @@
           (r.finished_at ? '–' + fmtTime(r.finished_at) : '') +
           (durationTxt(r.started_at, r.finished_at) ? ' · ' + durationTxt(r.started_at, r.finished_at) : '') +
           (r.from && r.to ? ' · období ' + fmtDate(r.from) + ' – ' + fmtDate(r.to) : '') +
-          (r.tab ? ' · ' + (r.tab === 'earrings' ? 'náušnice' : 'prsteny') : '') +
+          ''  + 
         '</span>' +
       '</div>' +
       '<span class="cal-chip ' + (r.finished ? 'cal-chip-ok' : 'cal-chip-draft') + '">' +

@@ -83,7 +83,7 @@
       var a = t.args || {};
       var d = [];
       if (a.segment) d.push(a.segment);
-      if (a.tab) d.push(a.tab === 'earrings' ? 'náušnice' : 'prsteny');
+      /* NK má jednu kategorii, tab se do popisu nepřidává. */
       if (a.days) d.push(a.days + ' d');
       return (TOOL_CZ[t.name] || t.name) + (d.length ? ' (' + d.join(', ') + ')' : '');
     });
