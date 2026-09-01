@@ -1,0 +1,30 @@
+plugins = []
+headers = []
+redirects = []
+
+[build]
+edge_functions = "/Users/vojtech/nk_stack/nk-nastroje-web/netlify/edge-functions"
+publish = "/Users/vojtech/nk_stack/nk-nastroje-web"
+publishOrigin = "config"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[edge_functions]]
+function = "brana"
+path = "/*"
+
+[functions]
+
+[functions."*"]
