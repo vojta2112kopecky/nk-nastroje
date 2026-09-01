@@ -1625,7 +1625,7 @@
           // H5: popisek i číslo ze serveru (health.headline_*) → nemůžou se rozejít.
           '<div class="big-label">' + esc(headlineLabel) + ' (' +
             (isEar ? 'zaplaceno' : 'model') + ')</div>' +
-          '<div class="big-note">' + esc(isEar ? 'Náušnice' : 'Prsteny') +
+          '<div class="big-note">' + esc('Reklamy') +
             (maxNote ? ' · data do ' + fmt.date(maxNote) : '') +
             (immature ? ' · <span style="color:var(--yellow);font-weight:650">okno zralé ~'
                         + fmt.pct(ripe) + ' → nadhodnoceno</span>' : '') +

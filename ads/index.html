@@ -2,10 +2,7 @@
 <html lang="cs">
 <head>
 <script>
-/* Na webu není backend – bez mock=1 by dashboard jen házel chyby. */
-if (!/[?&]mock=1\b/.test(location.search)) {
-  location.replace(location.pathname + '?mock=1' + location.hash);
-}
+if (!/[?&]mock=1\b/.test(location.search)) location.replace(location.pathname + '?mock=1' + location.hash);
 </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -14,7 +11,7 @@ if (!/[?&]mock=1\b/.test(location.search)) {
   <title>NK Ads — kill/scale</title>
 
   <!-- =============================================================
-       CACHE BUSTING (NÁLEZ #7) — ?v=202608171835 u KAŽDÉHO assetu.
+       CACHE BUSTING (NÁLEZ #7) — ?v=nk20260901 u KAŽDÉHO assetu.
        =============================================================
        Host posílá na statiku `Cache-Control: public` + `Expires: +1 ROK`
        (ověřeno naostro 16. 7. 2026: app.js → Expires 16. 7. 2027) → bez verze
@@ -32,20 +29,20 @@ if (!/[?&]mock=1\b/.test(location.search)) {
        zůstat viset ve staré cache, kdyby se někdy vyměnily.
        ============================================================= -->
   <!-- Vendor CSS (self-hosted, žádné CDN) -->
-  <link rel="stylesheet" href="vendor/tabulator.min.css?v=202608171835">
-  <link rel="stylesheet" href="vendor/flatpickr.min.css?v=202608171835">
+  <link rel="stylesheet" href="vendor/tabulator.min.css?v=nk20260901">
+  <link rel="stylesheet" href="vendor/flatpickr.min.css?v=nk20260901">
   <!-- Design systém (light) -->
-  <link rel="stylesheet" href="styles.css?v=202608171835">
+  <link rel="stylesheet" href="styles.css?v=nk20260901">
   <!-- Per-modulové styly (FEEDBACK-6). Vlastní soubory schválně: na modulech pracovalo víc
        lidí/agentů paralelně a jeden společný styles.css by si přepisovali. Pořadí = PO
        styles.css, ať můžou přebít základ. -->
-  <link rel="stylesheet" href="css/views.css?v=202608171835">
-  <link rel="stylesheet" href="css/newest.css?v=202608171835">
-  <link rel="stylesheet" href="css/picker.css?v=202608171835">
-  <link rel="stylesheet" href="css/ai.css?v=202608171835">
-  <link rel="stylesheet" href="css/settings.css?v=202608171835">
-  <link rel="stylesheet" href="css/tables.css?v=202608171835">
-  <link rel="stylesheet" href="css/wizard.css?v=202608171835">
+  <link rel="stylesheet" href="css/views.css?v=nk20260901">
+  <link rel="stylesheet" href="css/newest.css?v=nk20260901">
+  <link rel="stylesheet" href="css/picker.css?v=nk20260901">
+  <link rel="stylesheet" href="css/ai.css?v=nk20260901">
+  <link rel="stylesheet" href="css/settings.css?v=nk20260901">
+  <link rel="stylesheet" href="css/tables.css?v=nk20260901">
+  <link rel="stylesheet" href="css/wizard.css?v=nk20260901">
 </head>
 <body>
 
@@ -96,7 +93,7 @@ if (!/[?&]mock=1\b/.test(location.search)) {
         </div>
         <!-- Sbalený sidebar: plný název se schová, ale hlavička nesmí zůstat prázdná
              (60px bílé plochy vypadá jako chyba renderu) → značka se zmenší na „E". -->
-        <span class="brand-mini" aria-hidden="true">E</span>
+        <span class="brand-mini" aria-hidden="true">NK</span>
         <button id="sn-toggle" class="sn-toggle" type="button"
                 aria-expanded="true" aria-controls="sn-nav" title="Sbalit menu">
           <span class="sn-toggle-ico" aria-hidden="true"></span>
@@ -123,15 +120,9 @@ if (!/[?&]mock=1\b/.test(location.search)) {
         <h1 id="route-title" class="route-title">Hlavní dashboard</h1>
 
         <!-- Ovládání dashboardu (tab + období). Na jiných routách se skryje —
-             perioda ani Prsteny/Náušnice nemají v Nastavení/Kalendáři co dělat. -->
+             perioda nemá v Nastavení a Kalendáři co dělat. -->
         <div id="dash-controls" class="dash-controls">
-          <!-- Přepínač Prsteny / Náušnice -->
-          <div id="tab-switch" class="seg" role="tablist" aria-label="Produkt">
-            <button class="seg-btn is-active" data-tab="rings" role="tab" type="button">Prsteny</button>
-            <button class="seg-btn" data-tab="earrings" role="tab" type="button">Náušnice</button>
-          </div>
-
-          <!-- Picker období: chip presety + vlastní (N4: BEZ 7denního; N5: popover) -->
+<!-- Picker období: chip presety + vlastní (N4: BEZ 7denního; N5: popover) -->
           <div class="period">
             <div id="period-chips" class="chips" aria-label="Období"><!-- app.js --></div>
             <button id="period-custom-btn" class="chip chip-custom" type="button"
@@ -284,82 +275,7 @@ if (!/[?&]mock=1\b/.test(location.search)) {
         </section>
 
       </div>
-
-      <!-- ===== NÁUŠNICE VIEW =====
-           POZOR: #earrings-root je VIEW kontejner (app.js mu přepíná [hidden]),
-           NE mount tabulky. Grafy mají VLASTNÍ mount (#charts-earrings), protože
-           #charts-root leží uvnitř #rings-view → při tabu Náušnice je display:none.
-           tables.js mountuje do #earrings-kill / #earrings-winners / #earrings-table
-           (ensureScaffold přepisuje innerHTML mountu → nesmí to být tenhle wrapper).
-           .sec wrappery jsou mezivrstva navíc — mounty samotné zůstávají beze změny. -->
-      <div id="earrings-root" class="view" hidden>
-
-        <section class="sec" data-sec="ear-kill">
-          <h2 class="sec-h">
-            <button class="sec-head" type="button" aria-expanded="false" aria-controls="secbody-ear-kill">
-              <span class="sec-chev" aria-hidden="true"></span>
-              <span class="sec-ico" aria-hidden="true">🔴</span>
-              <span class="sec-title">Náušnice — na kill</span>
-              <span class="sec-count" data-sec-count hidden></span>
-              <span class="sec-sub" data-sec-sub>spálené peníze nejdřív (na zaplaceno)</span>
-            </button>
-          </h2>
-          <div class="sec-body" id="secbody-ear-kill">
-            <!-- Legenda pravidel (Filip 14. 8.): staticky v HTML, ne JS injektáží —
-                 tables.js na ni jen věší onclick (killLegendHTML). -->
-            <button class="kill-legend-link" type="button">ℹ️ Jak fungují kill pravidla a gaty</button>
-            <section id="earrings-kill" class="section" aria-label="Náušnice — na kill"></section>
-          </div>
-        </section>
-
-        <section class="sec" data-sec="ear-winners">
-          <h2 class="sec-h">
-            <button class="sec-head" type="button" aria-expanded="false" aria-controls="secbody-ear-winners">
-              <span class="sec-chev" aria-hidden="true"></span>
-              <span class="sec-ico" aria-hidden="true">🟢</span>
-              <span class="sec-title">Náušnice — winners</span>
-              <span class="sec-count" data-sec-count hidden></span>
-              <span class="sec-sub" data-sec-sub>nejvyšší ROAS zaplaceno</span>
-            </button>
-          </h2>
-          <div class="sec-body" id="secbody-ear-winners">
-            <section id="earrings-winners" class="section" aria-label="Náušnice — winners"></section>
-          </div>
-        </section>
-
-        <section class="sec" data-sec="ear-charts">
-          <h2 class="sec-h">
-            <button class="sec-head" type="button" aria-expanded="false" aria-controls="secbody-ear-charts">
-              <span class="sec-chev" aria-hidden="true"></span>
-              <span class="sec-ico" aria-hidden="true">📊</span>
-              <span class="sec-title">Grafy náušnic</span>
-              <span class="sec-count" data-sec-count hidden></span>
-              <span class="sec-sub" data-sec-sub>vývoj metrik v čase</span>
-            </button>
-          </h2>
-          <div class="sec-body" id="secbody-ear-charts">
-            <section id="charts-earrings" class="section" aria-label="Grafy náušnic"></section>
-          </div>
-        </section>
-
-        <section class="sec" data-sec="ear-table">
-          <h2 class="sec-h">
-            <button class="sec-head" type="button" aria-expanded="false" aria-controls="secbody-ear-table">
-              <span class="sec-chev" aria-hidden="true"></span>
-              <span class="sec-ico" aria-hidden="true">💎</span>
-              <span class="sec-title">Náušnice</span>
-              <span class="sec-count" data-sec-count hidden></span>
-              <span class="sec-sub" data-sec-sub>kreativa × období (na zaplaceno)</span>
-            </button>
-          </h2>
-          <div class="sec-body" id="secbody-ear-table">
-            <section id="earrings-table" class="section" aria-label="Náušnice — kreativa × období"></section>
-          </div>
-        </section>
-
-      </div>
-
-      </div><!-- /#view-dashboard -->
+</div><!-- /#view-dashboard -->
 
       <!-- =============================================================
            ROUTA: Nastavení  (mount pro settings.js — DOHODNUTÉ ID)
@@ -389,17 +305,17 @@ if (!/[?&]mock=1\b/.test(location.search)) {
   <!-- mock.js naplní ADS._mock (čte se až za běhu v api())          -->
   <!-- ============================================================= -->
   <!-- ⚠️ ?v= musí sedět se stampem v <head> — bumpuje ho deploy.py jedním regexem (nález #7) -->
-  <script src="vendor/echarts.min.js?v=202608171835"></script>
-  <script src="vendor/tabulator.min.js?v=202608171835"></script>
-  <script src="vendor/flatpickr.min.js?v=202608171835"></script>
+  <script src="vendor/echarts.min.js?v=nk20260901"></script>
+  <script src="vendor/tabulator.min.js?v=nk20260901"></script>
+  <script src="vendor/flatpickr.min.js?v=nk20260901"></script>
 
-  <script src="app.js?v=202608171835"></script>
+  <script src="app.js?v=nk20260901"></script>
   <!-- views.js = view engine (KONSOLIDACE) a TVRDÁ závislost tables.js. Musí být PŘED
        ním: tables.js si ho sice umí doloadovat sám, kdyby tag chyběl, ale to je jen
        záchranná brzda — takhle se načte se správným ?v= stampem a bez extra requestu
        navíc v runtime. -->
-  <script src="views.js?v=202608171835"></script>
-  <script src="tables.js?v=202608171835"></script>
+  <script src="views.js?v=nk20260901"></script>
+  <script src="tables.js?v=nk20260901"></script>
   <!-- N1 ROUTY: moduly sekcí Nastavení / Kalendář. Mountují si do #view-settings /
        #view-calendar, poslouchají ADS.bus 'routechange' a mount si označí
        data-owned="1" (pak jim app.js nepřekreslí placeholder přes obsah).
@@ -407,17 +323,17 @@ if (!/[?&]mock=1\b/.test(location.search)) {
        Když soubor chybí, app.js do routy dokreslí placeholder — nic nespadne.
        ⚠️ deploy.py: doplnit `views.js`, `settings.js`, `calendar.js` A `newest.js` do
           seznamu souborů (dnes tam NEJSOU → viz notes_for_integrator). -->
-  <script src="settings.js?v=202608171835"></script>
-  <script src="calendar.js?v=202608171835"></script>
+  <script src="settings.js?v=nk20260901"></script>
+  <script src="calendar.js?v=nk20260901"></script>
   <!-- newest.js MUSÍ být až ZA tables.js: obě registrují ADS.onReady callback do
        stejného mountu #newest a callbacky běží v pořadí registrace → kdo je později,
        vykreslí se navrch. Je to jen pojistka pro případ, že by v tables.js zůstalo
        viset volání renderNewest() — integrátor ho má vypnout (viz notes). -->
-  <script src="newest.js?v=202608171835"></script>
-  <script src="charts.js?v=202608171835"></script>
-  <script src="wizard.js?v=202608171835"></script>
-  <script src="ai.js?v=202608171835"></script>
-  <script src="mock.js?v=202608171835"></script>
+  <script src="newest.js?v=nk20260901"></script>
+  <script src="charts.js?v=nk20260901"></script>
+  <script src="wizard.js?v=nk20260901"></script>
+  <script src="ai.js?v=nk20260901"></script>
+  <script src="nkdata.js"></script>
 
   <!-- ============================================================= -->
   <!-- SBALOVACÍ SEKCE (FEEDBACK C3) — shell, NEsahá do window.ADS.  -->
