@@ -1,0 +1,7 @@
+[build]
+  publish = "."
+
+# Brána běží před vším ostatním, včetně statických souborů.
+[[edge_functions]]
+  function = "brana"
+  path = "/*"
