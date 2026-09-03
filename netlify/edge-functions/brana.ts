@@ -64,6 +64,8 @@ export default async (request: Request) => {
   if (kam === "/builder/api/lead") return;
   // Statika publikovaných stránek. Za heslem by z funnelu zbyl holý text.
   if (VEREJNA_STATIKA.has(kam) || kam.startsWith("/fonts/")) return;
+  // E-book zdarma je veřejný lead magnet – heslo by ho zabilo.
+  if (kam === "/ebookzdarma" || kam.startsWith("/ebookzdarma/")) return;
   if (kam.startsWith("/builder/p/") && !kam.replace(/\/+$/, "").endsWith("/koncept")) return;
 
   const heslo = Deno.env.get("NK_HESLO");

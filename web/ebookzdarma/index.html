@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tři tajemství High Ticket programu | Nejlepší Koučka</title>
+<meta name="description" content="Jak si zdvojnásobit příjem z koučinku nad 250 tisíc měsíčně, aniž byste každý den natáčela videa, psala newslettery a pálila peníze v reklamě.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/ebookzdarma/nk-logo.svg">
+<style>
+/* ---- písma Nejlepší Koučka (vlastní soubory, žádná náhrada) ---- */
+@font-face{font-family:"Playfair Display";font-weight:700;font-style:normal;font-display:swap;src:url(/fonts/nk/PlayfairDisplay-Bold.woff2) format("woff2")}
+@font-face{font-family:"Playfair Display";font-weight:400;font-style:italic;font-display:swap;src:url(/fonts/nk/PlayfairDisplay-Italic.woff2) format("woff2")}
+@font-face{font-family:"Lato";font-weight:400;font-style:normal;font-display:swap;src:url(/fonts/nk/Lato-Regular.woff2) format("woff2")}
+@font-face{font-family:"Lato";font-weight:700;font-style:normal;font-display:swap;src:url(/fonts/nk/Lato-Bold.woff2) format("woff2")}
+@font-face{font-family:"Lato";font-weight:400;font-style:italic;font-display:swap;src:url(/fonts/nk/Lato-Italic.woff2) format("woff2")}
+@font-face{font-family:"Lora";font-weight:400;font-style:normal;font-display:swap;src:url(/fonts/nk/Lora-Regular.woff2) format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-style:normal;font-display:swap;src:url(/fonts/nk/OpenSans-Bold.woff2) format("woff2")}
+
+:root{
+  --bg:#FBF6F8; --text:#212529; --magenta:#A80D64; --magenta-hover:#8A0B52; --teal:#045C56;
+  --hl-pink:#F6D9E7; --hl-teal:#DCECEA; --surface:#FBECF3; --white:#FFFFFF; --line:#E8D9E0;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Lato",Arial,sans-serif; font-size:18px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:660px;margin:0 auto;padding:0 22px}
+img{max-width:100%;height:auto;display:block}
+
+/* ---- lišta s tiskem ---- */
+.bar{
+  position:sticky; top:0; z-index:20; background:rgba(251,246,248,.94);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+}
+.bar .in{max-width:660px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:14px}
+.bar .logo{height:26px;width:auto}
+.bar .sp{flex:1}
+.print{
+  font-family:"Open Sans",Arial,sans-serif;font-weight:700;font-size:13px;
+  color:var(--teal); background:var(--hl-teal); border:0; border-radius:8px;
+  padding:9px 16px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+}
+.print:hover{background:#CDE5E1}
+.print:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.print svg{width:15px;height:15px;flex:none}
+
+/* ---- obálka ---- */
+.cover{padding:54px 0 10px}
+.cover .mark{width:74px;margin:0 0 26px}
+.eyebrow{
+  font-family:"Open Sans",Arial,sans-serif;font-weight:700;font-size:12px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin:0 0 16px;
+}
+.eyebrow span{background:var(--hl-teal);padding:3px 7px}
+h1{
+  font-family:"Playfair Display",Georgia,serif;font-weight:700;
+  font-size:clamp(31px,6.4vw,46px);line-height:1.12;margin:0 0 18px;
+}
+h1 em{font-style:italic;color:var(--magenta)}
+.cover .sub{font-family:"Lora",Georgia,serif;font-size:19px;line-height:1.55;margin:0 0 26px}
+.byline{
+  font-family:"Open Sans",Arial,sans-serif;font-weight:700;font-size:12px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin:0;
+}
+hr.rule{border:0;border-top:1px solid var(--line);margin:44px 0}
+
+/* ---- kapitoly ---- */
+.chapter{padding:8px 0 0}
+.chno{
+  font-family:"Open Sans",Arial,sans-serif;font-weight:700;font-size:11.5px;
+  letter-spacing:.24em;text-transform:uppercase;color:var(--teal);margin:44px 0 8px;
+}
+h2{
+  font-family:"Playfair Display",Georgia,serif;font-weight:700;
+  font-size:clamp(25px,4.6vw,33px);line-height:1.2;margin:0 0 20px;
+}
+h3{
+  font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:21px;
+  line-height:1.28;margin:34px 0 12px;color:var(--magenta);
+}
+p{margin:0 0 18px}
+.lead{font-size:19.5px}
+b,strong{font-weight:700}
+em{font-style:italic}
+.mg{color:var(--magenta);font-weight:700}
+.hl{background:linear-gradient(transparent 58%,var(--hl-pink) 58%)}
+.hlt{background:linear-gradient(transparent 58%,var(--hl-teal) 58%)}
+.pull{
+  font-family:"Lora",Georgia,serif;font-size:21px;line-height:1.5;color:var(--teal);
+  border-left:4px solid var(--hl-teal);padding:2px 0 2px 22px;margin:30px 0;
+}
+
+/* ---- důkaz ---- */
+.proof{
+  background:var(--white);border:1px solid var(--line);border-radius:16px;
+  padding:26px;margin:30px 0;
+}
+.proof .who{display:flex;align-items:center;gap:16px;margin:0 0 18px}
+.proof .who img{width:74px;height:74px;border-radius:50%;object-fit:cover;flex:none}
+.proof .who .n{font-family:"Playfair Display",serif;font-weight:700;font-size:20px;line-height:1.2;margin:0}
+.proof .who .r{font-size:14.5px;color:var(--teal);font-weight:700;margin:3px 0 0}
+.proof figure{margin:0}
+.proof figure img{border:1px solid var(--line);border-radius:10px}
+.proof figcaption{font-size:13.5px;color:var(--text);opacity:.72;margin:10px 0 0;text-align:center}
+
+/* ---- nabídka ---- */
+.offer{
+  background:var(--surface);border-left:5px solid var(--magenta);
+  padding:24px 26px;margin:30px 0;
+}
+.offer .num{
+  font-family:"Open Sans",Arial,sans-serif;font-weight:700;font-size:11.5px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--magenta);margin:0 0 12px;
+}
+.offer p:last-child{margin-bottom:0}
+
+/* ---- CTA + formulář ---- */
+.cta{text-align:center;margin:40px 0 0}
+.btn{
+  display:inline-block;background:var(--magenta);color:var(--white);
+  font-family:"Open Sans",Arial,sans-serif;font-weight:700;font-size:17px;line-height:1.3;
+  padding:17px 34px;border-radius:10px;border:0;cursor:pointer;text-decoration:none;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.2);
+}
+.btn:hover{background:var(--magenta-hover)}
+.btn:focus-visible{outline:3px solid var(--hl-pink);outline-offset:3px}
+.end{
+  text-align:center;margin:46px 0 0;color:var(--teal);
+  font-family:"Playfair Display",Georgia,serif;font-size:23px;line-height:1.4;
+}
+footer{padding:50px 0 60px;text-align:center;font-size:13.5px;opacity:.7}
+
+/* ---- tisk ---- */
+@page{size:A4;margin:18mm 17mm}
+@media print{
+  .bar,.cta{display:none !important}
+  html,body{background:#fff}
+  body{font-size:10.5pt;line-height:1.62;color:#212529}
+  .wrap{max-width:none;padding:0}
+  .cover{padding:0 0 6mm;page-break-after:always}
+  .cover .mark{width:22mm}
+  h1{font-size:26pt}
+  h2{font-size:18pt}
+  h3{font-size:13pt}
+  .lead{font-size:11pt}
+  .chno{margin:0 0 3mm}
+  .chapter{page-break-before:always}
+  .proof,.offer,.pull{page-break-inside:avoid}
+  .proof figure img{max-width:120mm;margin:0 auto}
+  hr.rule{display:none}
+  a[href]:after{content:""}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="in">
+    <img class="logo" src="/ebookzdarma/nk-logo.svg" alt="Nejlepší Koučka">
+    <span class="sp"></span>
+    <button class="print" type="button" onclick="window.print()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+      Vytisknout
+    </button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="cover">
+    <img class="mark" src="/ebookzdarma/nk-logo.svg" alt="">
+    <p class="eyebrow"><span>E‑book zdarma</span></p>
+    <h1>Tři tajemství<br>High Ticket programu<br><em>pro zkušené koučky</em></h1>
+    <p class="sub">Jak si můžete zdvojnásobit příjem z koučinku nad 250 tisíc měsíčně, aniž byste každý den natáčela videa, psala newslettery a pálila peníze v reklamě.</p>
+    <p class="byline">Vojtěch Kopecký · Nejlepší Koučka</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter">
+    <p class="chno">Úvodem</p>
+    <h2>Nemusíte být vidět, abyste měla klienty</h2>
+    <p class="lead">Vážená koučko a terapeutko, věděla jste, že abyste pracovala kdy chcete a odkud chcete, zdvojnásobila svůj příjem a konečně se dostala <span class="hl">nad 250 tisíc měsíčně</span>, nemusíte každý den natáčet videa na sociální sítě, psát e‑maily, pálit peníze v reklamě, a dokonce nemusíte být ani známá?</p>
+    <p>Vím, že to zní bláznivě. Od různých marketingových expertů a odborníků totiž slýcháme pořád dokola, že získávání klientů spočívá v tom, že musíte každý den něco tvořit. Že musíte mít ideálního klienta, točit více videí, psát další e‑maily, budovat si síť a reference a hlavně že musíte být vidět.</p>
+    <p>A tak tvoříte. Nebo jste se už ve všech těch marketingových poučkách ztratila a necítíte v tom žádnou autenticitu.</p>
+    <p>Dovolte mi, ať vás dnes, asi jako úplně první člověk, od kterého to uslyšíte, vyvedu z omylu. Ukážu vám <span class="mg">tři tajemství High Ticket programu</span>, díky kterým si budete moci vybírat, s kým pracujete, a zdvojnásobíte svůj příjem nad 250 tisíc měsíčně. A s nejistotou, jak takový program vytvořit a jak pro něj získat klienty, bude konec.</p>
+  </section>
+
+  <section class="chapter">
+    <p class="chno">Kdo vám to píše</p>
+    <h2>Vojta Kopecký</h2>
+    <p class="lead">Jmenuji se Vojta Kopecký a vedu projekt Nejlepší Koučka. Věřím, že koučky a terapeutky jsou podnikatelky, které nejvíce umí změnit společnost k lepšímu.</p>
+    <p>Pomáhám koučkám, které už investovaly stovky tisíc do výcviků a školení, ale pořád nemají funkční systém, jenž jim každý den přivádí prémiové a motivované klienty a dostane je nad 250 tisíc měsíčně. Ne plané sliby, ale realita, která vám zdvojnásobí příjem a vrátí svobodu.</p>
+    <p>Takže: jaký je nejrychlejší a nejjednodušší způsob, jak toho dosáhnout?</p>
+  </section>
+
+  <section class="chapter">
+    <p class="chno">Tajemství první</p>
+    <h2>Program „High Ticket“</h2>
+    <p class="lead">Nechcete si účtovat za hodinu konzultace. Abyste zdvojnásobila svůj příjem, musela byste mít dvakrát více konzultací než teď. Na to jako koučka nemůžete mít kapacitu a akorát se udřete. Je to proto, že <span class="hl">vyměňujete svůj čas za peníze</span>.</p>
+    <p>Možná si teď říkáte, že jsem spadl z višně. Jak máte prodávat svůj koučink, když ne jako sezení? A já se vám nedivím. Doposud vás nikdo nenaučil systém, jak čas za peníze vyměňovat přestat.</p>
+    <p>High Ticket program ve vašem podnikání bude určen jen pro klienty, které si vy vyberete a kteří už mají o vaše služby zájem. A víte, proč ten zájem budou mít? Protože program nebude o sezeních. Sezení lidé ani nechtějí. Vy budete komunikovat <span class="mg">jeden jediný specifický problém</span>, se kterým jim v programu pomůžete.</p>
+    <p>Proto si vaší pomoci budou vážit mnohem více a budou vás brát jako odborníka. Vyberou si vás tisíckrát raději než vaši konkurenci. Tohle dělá zhruba <span class="hlt">jedno procento všech kouček</span> a vy tak budete moci přestat vyměňovat čas za peníze.</p>
+  </section>
+
+  <section class="chapter">
+    <p class="chno">Tajemství druhé</p>
+    <h2>Váš dar</h2>
+    <p class="lead">S čím tedy budete klientům ve svém programu pomáhat? Tady přichází druhé tajemství: váš dar.</p>
+    <p class="pull">Deepak Chopra říká, že každý máme jedinečný dar, se kterým můžeme pomáhat lidem.</p>
+    <p>Na ten se chci, abyste se autenticky zaměřila. Bude to váš dar, který pomáhá řešit specifický problém klientů. A bude to <span class="hl">jediná věc</span>, kterou budete v High Ticket programu komunikovat jako životní transformaci.</p>
+    <h3>Proč jen jednu věc</h3>
+    <p>Představte si ženu, říkejme jí Martina. Martinu bolí záda. Může jít za praktickým lékařem, který jí pomůže se vším, ale jen povrchově. Nebo může jít za opravdovým odborníkem na její konkrétní problém, za fyzioterapeutem, který se na bolest zad specializuje.</p>
+    <p>Přesně takhle si klienti zvolí váš High Ticket program. Protože jim dáte najevo, že se svým darem rozumíte jejich situaci a vyřešíte přesně jejich problém.</p>
+  </section>
+
+  <section class="chapter">
+    <p class="chno">Tajemství třetí</p>
+    <h2>Emoční stránka</h2>
+    <p class="lead">Třetí tajemství je emoční stránka. Jednoduchá stránka na webu, která vám High Ticket program naplní doslova na kliknutí tlačítka.</p>
+    <p>Nemusíte ji složitě technicky nastavovat ani sama ladit. Stránka běží automaticky a vy se jen díváte, jací motivovaní klienti k vám chodí, a vybíráte si z nich.</p>
+
+    <h3>A funguje to vůbec?</h3>
+    <p>Koučka Ivana prodala svůj High Ticket program hned na první konzultaci za <span class="hl">30 tisíc korun</span> a za <span class="hl">dva dny od spuštění funnelu</span> prodala celkem za <span class="hl">75 tisíc korun</span>.</p>
+
+    <div class="proof">
+      <div class="who">
+        <img src="/ebookzdarma/ivana.jpg" alt="Ivana Mesárošová">
+        <div>
+          <p class="n">Ivana Mesárošová</p>
+          <p class="r">koučka · zdraví a mikrobiom</p>
+        </div>
+      </div>
+      <figure>
+        <img src="/ebookzdarma/dukaz-75tisic.jpg" alt="Zpráva od Ivany Mesárošové: dva dny spuštěný funnel a prodáno za 75 000 Kč">
+        <figcaption>Zpráva od Ivany dva dny po spuštění funnelu.</figcaption>
+      </figure>
+    </div>
+
+    <p>Za pouhé dva dny. A kouček, které High Ticket program používají, aby překonaly příjem 250 tisíc měsíčně, jsou v Česku desítky.</p>
+  </section>
+
+  <section class="chapter">
+    <p class="chno">Shrnutí</p>
+    <h2>Stačí tři věci</h2>
+    <p class="lead">Abyste se dostala na stabilní příjem dvě stě padesát tisíc korun měsíčně, stačí vám <span class="mg">jeden High Ticket program</span>, <span class="mg">váš dar</span> a <span class="mg">emoční stránka</span>. Nic víc.</p>
+    <p>Už žádná videa, newslettery, semináře, workshopy ani kurzy, které na vás vytvářejí tlak, abyste je zaplnila. A jen vám chci připomenout, že vy už zkušenosti máte a umíte úžasně pomáhat lidem. Možná tohle bude poslední dílek do skládačky, který vás nakopne a zdvojnásobí váš příjem.</p>
+    <p>Tak si sama řekněte, jak by vypadal váš život za tři měsíce, kdybyste se každé ráno vzbudila a mohla si vybírat z <span class="hlt">pěti až deseti motivovaných zájemců</span> o váš High Ticket program.</p>
+    <h3>Jak bude vypadat váš život</h3>
+    <p>Představte si, jak se vám bude podnikat a jaký budete mít osobní a rodinný život, až dosáhnete na 250 tisíc měsíčně.</p>
+    <p>Budete pracovat čtyři hodiny denně a vést klienty online, klidně z pláže v Portugalsku? Budete konečně mít čas na seberealizaci, na neziskové projekty a budete pomáhat ještě více lidem? Ať už se chcete postarat o svou rodinu, přestěhovat se do domku, nebo mít jenom stabilní systém a nezávislost, opravdu to můžete mít.</p>
+  </section>
+
+  <section class="chapter">
+    <p class="chno">Pozvání</p>
+    <h2>Řekněte možná</h2>
+    <p class="lead">Jestli to s vámi rezonuje, mám pro vás dobrou zprávu.</p>
+
+    <div class="offer">
+      <p class="num">Nabídka · 3 místa tento měsíc</p>
+      <p>Jen a pouze tento měsíc hledám <span class="mg">tři koučky</span>, které tímto systémem provedu a osobně dohlédnu na to, že si ho správně nastaví a zdvojnásobí své příjmy. Vytvořím s vámi váš High Ticket program, vyberu s vámi váš dar a postavím vám emoční stránku. A společně program naplníme motivovanými zájemci, ze kterých si budete vybírat.</p>
+      <p><b>A jestli se váš příjem do tří měsíců nezdvojnásobí, vrátím vám peníze.</b> Bez keců, čestně a pro vás bez rizika.</p>
+    </div>
+
+    <p>Teď máte dvě možnosti. Buď můžete tuhle knížku zavřít, znovu odložit moment, kdy změníte svůj život, dělat v koučování to, co děláte dosud, a být na to sama. Ale nebyla by to škoda?</p>
+    <p>Pro ty, které chtějí změnu a růst, je tu druhá možnost. Přijměte mé pozvání na nezávaznou strategickou konzultaci zdarma. Společně projdeme vaše podnikání, jak by mohl vypadat váš High Ticket program, jaký je váš dar a jak postavit emoční stránku. A zjistíme, jestli je tenhle systém pro vás.</p>
+    <p>Jak jsem ale říkal, tento měsíc mám prostor jen na tři klientky a omezený počet bezplatných konzultací.</p>
+
+    <div class="cta">
+      <a class="btn" href="https://nejlepsikoucka.cz/250-tisic/kvalifikace">Zjistit, zda je systém pro mě</a>
+    </div>
+
+    <p class="end">Řekněte možná.<br>Budu se na vás těšit.</p>
+  </section>
+
+  <footer>© Vojtěch Kopecký · Nejlepší Koučka</footer>
+</div>
+
+</body>
+</html>
