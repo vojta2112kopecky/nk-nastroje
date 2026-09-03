@@ -1,0 +1,28 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "lato",
+        "createdAt": "2026-09-03T15:10:04.037Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "open sans",
+        "createdAt": "2026-09-03T15:10:04.067Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "playfair display",
+        "createdAt": "2026-09-03T15:10:04.095Z"
+      },
+      {
+        "rule": "overused-font",
+        "value": "lora",
+        "createdAt": "2026-09-03T15:10:04.123Z"
+      }
+    ]
+  }
+}
